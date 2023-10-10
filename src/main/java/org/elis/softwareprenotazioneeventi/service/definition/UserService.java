@@ -9,10 +9,11 @@ import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
-    public LoginResponseDTO login(LoginRequestDTO request);
+    public User login(LoginRequestDTO request);
     public boolean registrazioneCliente(RegistrazioneRequestDTO request);
     public boolean registrazioneVenditore(RegistrazioneRequestDTO request);
     public boolean registrazioneAdmin(RegistrazioneRequestDTO request);
@@ -24,6 +25,7 @@ public interface UserService {
     public List<GetAllUsersResponseDTO> getAllUsers();
     public boolean modificaPassword(ModificaPasswordRequestDTO request);
 
+    public User findByEmail(String email);
 
 
 }

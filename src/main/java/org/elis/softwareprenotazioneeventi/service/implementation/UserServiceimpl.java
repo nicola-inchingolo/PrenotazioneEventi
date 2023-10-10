@@ -10,6 +10,7 @@ import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
+import org.elis.softwareprenotazioneeventi.exception.gestori.UserNotFoundException;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
@@ -219,17 +220,12 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
-    public LoginResponseDTO login(LoginRequestDTO request) {
+    public User login(LoginRequestDTO request) {
 
         Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
         if(user.isPresent()) {
             if(user.get().getAttivo()) {
-                LoginResponseDTO l = new LoginResponseDTO();
-                l.setEmail(user.get().getEmail());
-                l.setId(user.get().getId());
-                l.setRuolo(user.get().getRuolo().name());
-                l.setAnni((int) ChronoUnit.YEARS.between(user.get().getDataNascita(), LocalDate.now()));
-                return l;
+                return user.get();
             }
             else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è disattivato");
@@ -377,5 +373,10 @@ public class UserServiceimpl implements UserService {
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "utente non trovato");
         }
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     }
 }

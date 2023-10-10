@@ -48,6 +48,15 @@ public class GenericExceptionHandler {
 
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<MessaggioErroreDTO> userNotFoundException(UserNotFoundException e){
+        Map<String,String> map=new TreeMap<>();
+        map.put("utente",e.getMessage());
+        MessaggioErroreDTO m=new MessaggioErroreDTO();
+        m.setData(LocalDateTime.now());
+        m.setErrori(map);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(m);
+    }
 
 
 }

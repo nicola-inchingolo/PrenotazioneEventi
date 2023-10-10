@@ -8,6 +8,7 @@ import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.User;
+import org.elis.softwareprenotazioneeventi.security.TokenUtil;
 import org.elis.softwareprenotazioneeventi.service.definition.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +22,26 @@ import java.util.List;
 public class UserController {
 
 
-    UserService service;
+    private final UserService service;
+    private final TokenUtil util;
 
-    public UserController(UserService s)
+    public UserController(UserService s, TokenUtil t)
     {
         service = s;
+        util = t;
     }
 
     @GetMapping("/login")
     public ResponseEntity<LoginResponseDTO> login( @Valid @RequestBody LoginRequestDTO request){
-        LoginResponseDTO l= service.login(request);
-        return ResponseEntity.status(HttpStatus.OK).body(l);
+
+        User u= service.login(request);
+        String token = util.generaToken(u);
+        LoginResponseDTO l = new LoginResponseDTO();
+        l.setEmail(u.getEmail());
+        l.setId(u.getId());
+        l.setRuolo(u.getRuolo().name());
+        l.setAnni((int) ChronoUnit.YEARS.between(u.getDataNascita(), LocalDate.now()));
+        return ResponseEntity.status(HttpStatus.OK).header("Authorization" , token).body(l);
     }
 
     @PostMapping("/registraCliente")
