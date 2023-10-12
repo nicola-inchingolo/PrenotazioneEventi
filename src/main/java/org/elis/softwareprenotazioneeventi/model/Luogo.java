@@ -26,10 +26,8 @@ public class Luogo {
     private String provincia;
     private String cap;
     @OneToMany(mappedBy = "luogo")
-    @JsonManagedReference
     private List<Ripetizione> repliche;
     @OneToMany(mappedBy = "luogo")
-    @JsonManagedReference
     private List<Sezione> sezioni;
 
 

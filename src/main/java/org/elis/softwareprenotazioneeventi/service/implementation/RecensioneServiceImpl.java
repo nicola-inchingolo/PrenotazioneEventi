@@ -39,29 +39,28 @@ public class RecensioneServiceImpl implements  RecensioneService{
     }
 
     @Override
-    public boolean creaRecensione(CreaRecensioneRequestDTO request) {
+    public boolean creaRecensione(CreaRecensioneRequestDTO request, User user) {
 
-        Optional<User> user = userRepository.findById(request.getIdUser());
         Optional<Evento> evento = eventoRepository.findById(request.getIdEvento());
 
 
 
 
-        if(user.isPresent() &&  evento.isPresent())
+        if(evento.isPresent())
         {
-            List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.get().getEmail(), evento.get().getNome());
+            List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.getEmail(), evento.get().getNome());
             if(!biglietti.isEmpty()) {
                 Recensione recensione = new Recensione();
                 recensione.setDescrizione(request.getDescrizione());
                 recensione.setVotazione(request.getVotazione());
-                recensione.setUser(user.get());
+                recensione.setUser(user);
                 recensione.setEvento(evento.get());
 
-                user.get().getRecensioni().add(recensione);
+                user.getRecensioni().add(recensione);
                 evento.get().getRecensioni().add(recensione);
 
                 recensioneRepository.save(recensione);
-                userRepository.save(user.get());
+                userRepository.save(user);
                 eventoRepository.save(evento.get());
                 return true;
             }
@@ -91,14 +90,20 @@ public class RecensioneServiceImpl implements  RecensioneService{
     }
 
     @Override
-    public boolean modificaVotazione(ModificaVotazioneRequestDTO request) {
+    public boolean modificaVotazione(ModificaVotazioneRequestDTO request, User user) {
 
         Optional<Recensione> r = recensioneRepository.findById(request.getIdRecensione());
 
         if(r.isPresent())
         {
-            r.get().setVotazione(request.getNewVotazione());
-            return true;
+            if(r.get().getUser().equals(user)) {
+                r.get().setVotazione(request.getNewVotazione());
+                return true;
+            }
+            else
+            {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+            }
         }
         else
         {
@@ -107,14 +112,20 @@ public class RecensioneServiceImpl implements  RecensioneService{
     }
 
     @Override
-    public boolean modificaDescrizione(ModificaDescrizioneRecensioneDTO request) {
+    public boolean modificaDescrizione(ModificaDescrizioneRecensioneDTO request, User user) {
 
         Optional<Recensione> r = recensioneRepository.findById(request.getIdRecensione());
 
         if(r.isPresent())
         {
-            r.get().setDescrizione(request.getNewDescrizione());
-            return true;
+            if(r.get().getUser().equals(user)) {
+                r.get().setDescrizione(request.getNewDescrizione());
+                return true;
+            }
+            else
+            {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+            }
         }
         else
         {

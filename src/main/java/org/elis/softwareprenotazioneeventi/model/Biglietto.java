@@ -25,21 +25,17 @@ public class Biglietto {
     private Boolean venduto = false;
     @ManyToOne
     @JoinColumn(name = "id_user")
-    @JsonBackReference
     private User user;
     @ManyToMany
     @JoinTable(name = "carrello",
             joinColumns = @JoinColumn(name = "id_biglietto", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "id_utente", nullable = false))
-    @JsonBackReference
     private List<User> utenti;
     @OneToOne
     @JoinColumn(name = "id_posto", referencedColumnName = "id")
-    @JsonBackReference
     private Posto posto;
     @ManyToOne
     @JoinColumn(name = "id_ripetizione")
-    @JsonBackReference
     private Ripetizione ripetizione;
 
 

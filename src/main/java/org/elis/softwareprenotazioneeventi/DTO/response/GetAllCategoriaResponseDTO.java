@@ -17,6 +17,6 @@ public class GetAllCategoriaResponseDTO {
     private long id;
     private String nome;
 
-    private List<Evento> eventi;
+   //private List<GetAllEventsResponseDTO> eventi;
 
 }

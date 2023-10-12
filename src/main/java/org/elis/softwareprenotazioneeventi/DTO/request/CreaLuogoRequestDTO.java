@@ -18,8 +18,7 @@ public class CreaLuogoRequestDTO {
     private String provincia;
 
     private String cap;
-    @NotNull
-    private long idUserRichiesta;
+
 
 
 }

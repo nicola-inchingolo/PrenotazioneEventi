@@ -24,8 +24,7 @@ public class RegistrazioneRequestDTO {
     @Past(message = "non puoi essere nato nel futuro")
     private LocalDate dataDiNascita;
     @NotBlank(message = "non può essere null")
-    @Pattern(regexp = "[A-Z0-9]+.{16}$")
+    @Pattern(regexp = "[A-Z0-9]+.{15}$")
     private String codiceFiscale;
-    @NotNull
-    private long idUserRichiesta;
+
 }

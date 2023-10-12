@@ -20,10 +20,8 @@ public class Posto {
     private String nome;
     @ManyToOne
     @JoinColumn(name="id_sezione", nullable = false)
-    @JsonBackReference
     private Sezione sezione;
     @OneToOne(mappedBy = "posto")
-    @JsonManagedReference
     private Biglietto biglietto;
 
     public Posto(String nome) {

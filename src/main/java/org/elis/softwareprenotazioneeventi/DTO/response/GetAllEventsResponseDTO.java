@@ -13,8 +13,8 @@ public class GetAllEventsResponseDTO {
     private long idEvento;
     private String nome;
     private String descrizione;
-    private List<Categoria> categorie;
-    private List<Ripetizione> repliche;
+    private List<GetAllCategoriaResponseDTO> categorie;
+    private List<GetAllRipetizioneResponseDTO> repliche;
 
 
 

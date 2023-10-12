@@ -2,6 +2,7 @@ package org.elis.softwareprenotazioneeventi.DTO.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Recensione;
 import org.elis.softwareprenotazioneeventi.model.Role;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
 public class GetAllUsersResponseDTO
 {
     private long idUser;
@@ -22,9 +24,9 @@ public class GetAllUsersResponseDTO
     private String codiceFiscale;
     private Role ruolo;
     private Boolean attivo;
-    private List<Biglietto> carrello;
-    private List<Biglietto> bigliettiAcquistati;
-    private List<Recensione> recensioni;
+    private List<GetAllBigliettiResponseDTO> carrello;
+    private List<GetAllBigliettiResponseDTO> bigliettiAcquistati;
+    private List<GetAllRecensioniResponseDTO> recensioni;
 
 
 

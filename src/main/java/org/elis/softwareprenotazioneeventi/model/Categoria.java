@@ -24,8 +24,6 @@ public class Categoria {
     @JoinTable(name = "eventi_categorie",
     joinColumns = @JoinColumn(name = "id_categoria", nullable = false),
     inverseJoinColumns = @JoinColumn(name = "id_evento", nullable = false))
-    @JsonBackReference
-
     private List<Evento> eventi;
 
     public Categoria(String nome) {

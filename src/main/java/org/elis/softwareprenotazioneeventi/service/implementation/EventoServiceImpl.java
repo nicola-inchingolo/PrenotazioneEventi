@@ -1,7 +1,9 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaEventoRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Role;
@@ -36,9 +38,7 @@ public class EventoServiceImpl implements EventoService {
     @Override
     public boolean creazioneEvento(CreaEventoRequestDTO request)
     {
-        Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());
-        if(userRichiesta.isPresent()) {
-            if (userRichiesta.get().getRuolo().equals(Role.VENDITORE)) {
+
                 Optional<Evento> ev = eventoRepository.findByNome(request.getNome());
                 if (ev.isEmpty()) {
                     Evento evento = new Evento();
@@ -66,16 +66,6 @@ public class EventoServiceImpl implements EventoService {
                 {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "evento già esistente");
                 }
-            }
-            else
-            {
-              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");
-            }
-        }
-        else
-        {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
-        }
     }
 
     @Override
@@ -84,39 +74,92 @@ public class EventoServiceImpl implements EventoService {
          List<Evento> eventi = eventoRepository.findAll();
          List<GetAllEventsResponseDTO> response =  new ArrayList<>();
          eventi.forEach(e -> {
+
+             List<GetAllCategoriaResponseDTO> categorie = new ArrayList<>();
+             e.getCategorie().forEach(cat->{
+                 GetAllCategoriaResponseDTO categoria = new GetAllCategoriaResponseDTO(cat.getId(),cat.getNome());
+                 categorie.add(categoria);
+             });
+
+             List<GetAllRipetizioneResponseDTO> repliche = new ArrayList<>();
+             e.getRepliche().forEach(rep->{
+                 GetAllRipetizioneResponseDTO replica = new GetAllRipetizioneResponseDTO(rep.getId(),rep.getDatainizio(),rep.getDatafine(),rep.getOraInizio(),rep.getOraFine(),rep.getEvento().getNome(),rep.getLuogo().getNome());
+                 repliche.add(replica);
+             });
+
+
              response.add(
-                     new GetAllEventsResponseDTO(e.getId(),e.getNome(),e.getDescrizione(),e.getCategorie(),e.getRepliche())
+                     new GetAllEventsResponseDTO(e.getId(),e.getNome(),e.getDescrizione(),categorie,repliche)
              );
          });
 
          return response;
+
 
     }
 
     @Override
     public List<GetAllEventsResponseDTO> getAllEventsByDataInizio(LocalDate data)
     {
+
         List<Evento> eventi =  eventoRepository.findAllByRepliche_Datainizio(data);
         List<GetAllEventsResponseDTO> response = new ArrayList<>();
         eventi.forEach(e->{
-            response.add(new GetAllEventsResponseDTO(e.getId(), e.getNome(), e.getDescrizione(), e.getCategorie(), e.getRepliche()));
+
+            List<GetAllCategoriaResponseDTO> categorie = new ArrayList<>();
+            e.getCategorie().forEach(cat->{
+                GetAllCategoriaResponseDTO categoria = new GetAllCategoriaResponseDTO(cat.getId(),cat.getNome());
+                categorie.add(categoria);
+            });
+
+            List<GetAllRipetizioneResponseDTO> repliche = new ArrayList<>();
+            e.getRepliche().forEach(rep->{
+                GetAllRipetizioneResponseDTO replica = new GetAllRipetizioneResponseDTO(rep.getId(),rep.getDatainizio(),rep.getDatafine(),rep.getOraInizio(),rep.getOraFine(),rep.getEvento().getNome(),rep.getLuogo().getNome());
+                repliche.add(replica);
+            });
+
+            response.add(new GetAllEventsResponseDTO(e.getId(), e.getNome(), e.getDescrizione(), categorie, repliche));
         });
 
         return response;
+
+
     }
 
     //?? - sbagliato
     @Override
     public List<GetAllEventsResponseDTO> getAllEventsByLuogo(String nomeLuogo) {
+
+
+
         List<Evento> eventi =  eventoRepository.findAllByRepliche_Luogo_Nome(nomeLuogo);
         List<GetAllEventsResponseDTO> response = new ArrayList<>();
 
         eventi.forEach( e-> {
-            response.add(new GetAllEventsResponseDTO(e.getId(), e.getNome(), e.getDescrizione(), e.getCategorie(), e.getRepliche()));
+
+            List<GetAllCategoriaResponseDTO> categorie = new ArrayList<>();
+            e.getCategorie().forEach(cat->{
+                GetAllCategoriaResponseDTO categoria = new GetAllCategoriaResponseDTO(cat.getId(),cat.getNome());
+                categorie.add(categoria);
+            });
+
+            List<GetAllRipetizioneResponseDTO> repliche = new ArrayList<>();
+            e.getRepliche().forEach(rep->{
+                GetAllRipetizioneResponseDTO replica = new GetAllRipetizioneResponseDTO(rep.getId(),rep.getDatainizio(),rep.getDatafine(),rep.getOraInizio(),rep.getOraFine(),rep.getEvento().getNome(),rep.getLuogo().getNome());
+                repliche.add(replica);
+            });
+
+
+
+
+            response.add(new GetAllEventsResponseDTO(e.getId(), e.getNome(), e.getDescrizione(), categorie, repliche));
 
         });
 
         return response;
+
+
+
     }
 
     @Override

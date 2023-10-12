@@ -3,29 +3,20 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import org.elis.softwareprenotazioneeventi.DTO.request.AccountRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.*;
 import org.elis.softwareprenotazioneeventi.exception.gestori.UserNotFoundException;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.UserService;
-import org.elis.softwareprenotazioneeventi.utils.CodiceFicaleValidator;
-import org.elis.softwareprenotazioneeventi.utils.EmailValidator;
 import org.elis.softwareprenotazioneeventi.utils.PasswordValidator;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,12 +102,6 @@ public class UserServiceimpl implements UserService {
     @Override
     public boolean registrazioneVenditore(RegistrazioneRequestDTO request) {
 
-        Optional<User> uR = userRepository.findById(request.getIdUserRichiesta());
-
-        if(uR.isPresent()) {
-            User userRichiesta = uR.get();
-
-            if (userRichiesta.getRuolo().equals(Role.ADMIN) || userRichiesta.getRuolo().equals(Role.SUPERADMIN)) {
                 Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
                 if (user.isEmpty()) {
                     /*if (EmailValidator.isValidEmail(request.getEmail())) {
@@ -154,21 +139,11 @@ public class UserServiceimpl implements UserService {
                     }
                 }*/
                 else { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email già registrata");}
-            }
-            else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere questa azione");}
-        }
-        else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");}
     }
 
     @Override
     public boolean registrazioneAdmin(RegistrazioneRequestDTO request) {
 
-
-        Optional<User> uR = userRepository.findById(request.getIdUserRichiesta());
-        if(uR.isPresent()) {
-            User userRichiesta = uR.get();
-
-            if (userRichiesta.getRuolo().equals(Role.SUPERADMIN)) {
                 Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
                 if (user.isEmpty()) {
                     /*if (EmailValidator.isValidEmail(request.getEmail())) {
@@ -212,10 +187,7 @@ public class UserServiceimpl implements UserService {
                     }*/
                 }
                 else { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email già registrata");}
-            }
-            else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere questa azione");}
-        }
-        else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");}
+
 
     }
 
@@ -225,7 +197,7 @@ public class UserServiceimpl implements UserService {
         Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
         if(user.isPresent()) {
             if(user.get().getAttivo()) {
-                return user.get();
+                return user.orElseThrow(UserNotFoundException::new);
             }
             else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è disattivato");
@@ -238,28 +210,71 @@ public class UserServiceimpl implements UserService {
 
     @Override
     public List<GetAllUsersResponseDTO> findAllClienti() {
+
         List<User> users = userRepository.findAllByRuolo(Role.CLIENTE);;
         List<GetAllUsersResponseDTO> response =  new ArrayList<>();
         users.forEach(u -> {
+
+            List<GetAllBigliettiResponseDTO> carrello = new ArrayList<>();
+            u.getCarrello().forEach(ca->{
+
+                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(ca.getId(),ca.getPrezzo(),ca.getVenduto(),ca.getUser().getNome(),ca.getPosto().getNome(),ca.getRipetizione().getDatainizio(),ca.getRipetizione().getEvento().getNome());
+                carrello.add(bigliettoCarrello);
+            });
+            List<GetAllBigliettiResponseDTO> acquistati = new ArrayList<>();
+            u.getBigliettiAcquistati().forEach(ba->{
+
+                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
+                acquistati.add(bigliettoAcquistato);
+            });
+            List<GetAllRecensioniResponseDTO> recensioni = new ArrayList<>();
+            u.getRecensioni().forEach(re->{
+
+                GetAllRecensioniResponseDTO recensione = new GetAllRecensioniResponseDTO(re.getId(), re.getDescrizione(), re.getVotazione(),re.getUser().getNome(),re.getEvento().getNome());
+                recensioni.add(recensione);
+            });
+
             response.add(
-                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), u.getCarrello(),u.getBigliettiAcquistati(), u.getRecensioni())
+                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), carrello,acquistati, recensioni)
             );
         });
 
         return response;
+
     }
 
     @Override
     public List<GetAllUsersResponseDTO> findAllVenditori() {
-        List<User> users = userRepository.findAllByRuolo(Role.VENDITORE);;
+       List<User> users = userRepository.findAllByRuolo(Role.VENDITORE);;
         List<GetAllUsersResponseDTO> response =  new ArrayList<>();
         users.forEach(u -> {
+
+            List<GetAllBigliettiResponseDTO> carrello = new ArrayList<>();
+            u.getCarrello().forEach(ca->{
+
+                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(ca.getId(),ca.getPrezzo(),ca.getVenduto(),ca.getUser().getNome(),ca.getPosto().getNome(),ca.getRipetizione().getDatainizio(),ca.getRipetizione().getEvento().getNome());
+                carrello.add(bigliettoCarrello);
+            });
+            List<GetAllBigliettiResponseDTO> acquistati = new ArrayList<>();
+            u.getBigliettiAcquistati().forEach(ba->{
+
+                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
+                acquistati.add(bigliettoAcquistato);
+            });
+            List<GetAllRecensioniResponseDTO> recensioni = new ArrayList<>();
+            u.getRecensioni().forEach(re->{
+
+                GetAllRecensioniResponseDTO recensione = new GetAllRecensioniResponseDTO(re.getId(), re.getDescrizione(), re.getVotazione(),re.getUser().getNome(),re.getEvento().getNome());
+                recensioni.add(recensione);
+            });
+
             response.add(
-                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), u.getCarrello(),u.getBigliettiAcquistati(), u.getRecensioni())
+                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), carrello,acquistati, recensioni)
             );
         });
 
         return response;
+
     }
 
     @Override
@@ -268,35 +283,55 @@ public class UserServiceimpl implements UserService {
         List<User> users = userRepository.findAllByRuolo(Role.ADMIN);;
         List<GetAllUsersResponseDTO> response =  new ArrayList<>();
         users.forEach(u -> {
+
+            List<GetAllBigliettiResponseDTO> carrello = new ArrayList<>();
+            u.getCarrello().forEach(ca->{
+
+                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(ca.getId(),ca.getPrezzo(),ca.getVenduto(),ca.getUser().getNome(),ca.getPosto().getNome(),ca.getRipetizione().getDatainizio(),ca.getRipetizione().getEvento().getNome());
+                carrello.add(bigliettoCarrello);
+            });
+            List<GetAllBigliettiResponseDTO> acquistati = new ArrayList<>();
+            u.getBigliettiAcquistati().forEach(ba->{
+
+                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
+                acquistati.add(bigliettoAcquistato);
+            });
+            List<GetAllRecensioniResponseDTO> recensioni = new ArrayList<>();
+            u.getRecensioni().forEach(re->{
+
+                GetAllRecensioniResponseDTO recensione = new GetAllRecensioniResponseDTO(re.getId(), re.getDescrizione(), re.getVotazione(),re.getUser().getNome(),re.getEvento().getNome());
+                recensioni.add(recensione);
+            });
+
             response.add(
-                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), u.getCarrello(),u.getBigliettiAcquistati(), u.getRecensioni())
+                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), carrello,acquistati, recensioni)
             );
         });
 
         return response;
+
     }
 
-    @Override
-    public boolean bloccaAccount(AccountRequestDTO request) {
+    @Override//da rivedere
+    public boolean bloccaAccount(long idUser) {
 
-       Optional<User> user = userRepository.findById(request.getIdUser());
-       Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());
+       Optional<User> user = userRepository.findById(idUser);
+       /*Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());*/
 
-
-       if(user.isPresent() && userRichiesta.isPresent()) {
+       if(user.isPresent() /*&& userRichiesta.isPresent()*/) {
 
            if (user.get().getAttivo()) {
-               if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {
+               /*if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {*/
                    user.get().setAttivo(false);
                    userRepository.save(user.get());
                    return true;
-               } else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
+               /*} else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
                    user.get().setAttivo(false);
                    userRepository.save(user.get());
                    return true;
                }
                else { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");}
-           }
+           */}
            else {
                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è già disattivo");
            }
@@ -309,18 +344,18 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
-    public boolean sbloccaAccount(AccountRequestDTO request) {
+    public boolean sbloccaAccount(long idUser) {
 
-        Optional<User> user = userRepository.findById(request.getIdUser());
-        Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());
+        Optional<User> user = userRepository.findById(idUser);
+       /* Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());*/
 
-        if(user.isPresent() && userRichiesta.isPresent()) {
+        if(user.isPresent() /*&& userRichiesta.isPresent()*/) {
             if (!user.get().getAttivo()) {
-                if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {
+               /* if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {*/
                     user.get().setAttivo(true);
                     userRepository.save(user.get());
                     return true;
-                } else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
+                /*} else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
                     user.get().setAttivo(true);
                     userRepository.save(user.get());
                     return true;
@@ -328,7 +363,7 @@ public class UserServiceimpl implements UserService {
                 else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");
                 }
-            }
+            */}
             else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è già attivo");
             }
@@ -344,8 +379,27 @@ public class UserServiceimpl implements UserService {
         List<User> users = userRepository.findAll();
         List<GetAllUsersResponseDTO> response =  new ArrayList<>();
         users.forEach(u -> {
+
+            List<GetAllBigliettiResponseDTO> carrello = new ArrayList<>();
+            u.getCarrello().forEach(ca->{
+
+                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(ca.getId(),ca.getPrezzo(),ca.getVenduto(),ca.getUser().getNome(),ca.getPosto().getNome(),ca.getRipetizione().getDatainizio(),ca.getRipetizione().getEvento().getNome());
+                carrello.add(bigliettoCarrello);
+            });
+            List<GetAllBigliettiResponseDTO> acquistati = new ArrayList<>();
+            u.getBigliettiAcquistati().forEach(ba->{
+
+                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
+                acquistati.add(bigliettoAcquistato);
+            });
+            List<GetAllRecensioniResponseDTO> recensioni = new ArrayList<>();
+            u.getRecensioni().forEach(re->{
+
+                GetAllRecensioniResponseDTO recensione = new GetAllRecensioniResponseDTO(re.getId(), re.getDescrizione(), re.getVotazione(),re.getUser().getNome(),re.getEvento().getNome());
+                recensioni.add(recensione);
+            });
             response.add(
-                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), u.getCarrello(),u.getBigliettiAcquistati(), u.getRecensioni())
+                    new GetAllUsersResponseDTO(u.getId(),u.getNome(), u.getCognome(), u.getEmail(), u.getPassword(), u.getDataNascita(), u.getCodiceFiscale(), u.getRuolo(), u.getAttivo(), carrello,acquistati, recensioni)
             );
         });
 

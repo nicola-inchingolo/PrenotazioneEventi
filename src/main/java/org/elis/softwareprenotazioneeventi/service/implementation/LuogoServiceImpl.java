@@ -2,6 +2,9 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaLuogoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
@@ -12,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,10 +35,7 @@ public class LuogoServiceImpl implements LuogoService {
 
     @Override
     public boolean creazioneLuogo(CreaLuogoRequestDTO request) {
-        Optional<User> user = userRepository.findById(request.getIdUserRichiesta());
 
-        if(user.isPresent()) {
-            if (user.get().getRuolo().equals(Role.SUPERADMIN)) {
                 Optional<Luogo> l = luogoRepository.findByNome(request.getNome());
                 if (l.isEmpty()) {
                     Luogo luogo = new Luogo();
@@ -49,16 +51,8 @@ public class LuogoServiceImpl implements LuogoService {
                 {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "questo luogo è già esistente");
                 }
-            }
-            else
-            {
-               throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");
-            }
-        }
-        else
-        {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
-        }
+
+
     }
 
     @Override
@@ -69,12 +63,33 @@ public class LuogoServiceImpl implements LuogoService {
 
         luoghi.forEach(l ->
         {
+            List<GetAllRipetizioneResponseDTO> repliche = new ArrayList<>();
+            l.getRepliche().forEach(rep->{
+
+                GetAllRipetizioneResponseDTO replica = new GetAllRipetizioneResponseDTO(rep.getId(),rep.getDatainizio(),rep.getDatafine(),rep.getOraInizio(),rep.getOraFine(),rep.getEvento().getNome(),rep.getLuogo().getNome());
+                repliche.add(replica);
+            });
+
+            List<GetAllSezioniResponseDTO> sezioni = new ArrayList<>();
+            l.getSezioni().forEach(sez->
+            {
+                List<String> nomePosti = new ArrayList<>();
+                sez.getPosti().forEach(np->
+                {
+                    String nomeposto = np.getNome();
+                    nomePosti.add(nomeposto);
+                });
+                GetAllSezioniResponseDTO sezione = new GetAllSezioniResponseDTO(sez.getId(),sez.getNome(),sez.getLuogo().getNome(),nomePosti);
+                sezioni.add(sezione);
+            });
+
             response.add(
-              new GetAllLuoghiResponseDTO(l.getId(),l.getNome(),l.getVia(), l.getCittà(), l.getProvincia(), l.getCap(), l.getRepliche(), l.getSezioni())
+              new GetAllLuoghiResponseDTO(l.getId(),l.getNome(),l.getVia(), l.getCittà(), l.getProvincia(), l.getCap(), repliche, sezioni)
             );
         });
 
         return response;
+
 
     }
 

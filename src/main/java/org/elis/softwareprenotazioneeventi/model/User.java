@@ -18,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name="custom_user")
 public class User implements UserDetails {
 
     @Id
@@ -38,15 +39,10 @@ public class User implements UserDetails {
     private Role ruolo = Role.CLIENTE;
     private Boolean attivo = true;
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<Biglietto> bigliettiAcquistati;
-
     @ManyToMany(mappedBy = "utenti")
-    @JsonManagedReference
     private List<Biglietto> Carrello;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    @JsonManagedReference
     private List<Recensione> recensioni;
 
 
@@ -91,5 +87,20 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", cognome='" + cognome + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", dataNascita=" + dataNascita +
+                ", codiceFiscale='" + codiceFiscale + '\'' +
+                ", ruolo=" + ruolo +
+                ", attivo=" + attivo +
+                '}';
     }
 }

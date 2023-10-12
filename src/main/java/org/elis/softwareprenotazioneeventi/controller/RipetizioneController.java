@@ -5,10 +5,8 @@ import org.elis.softwareprenotazioneeventi.DTO.request.CreaReplicaDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.service.definition.RipetizioneService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,15 +21,15 @@ public class RipetizioneController {
     }
 
 
-    @GetMapping("/getAllRepliche")
-    public ResponseEntity<List<GetAllRipetizioneResponseDTO>> getAllRepliche()
+    @GetMapping("/venditore/getAllRepliche")
+    public ResponseEntity<List<GetAllRipetizioneResponseDTO>> getAllRepliche(UsernamePasswordAuthenticationToken upat)
     {
         return ResponseEntity.ok(service.getAllRipetizioni());
     }
 
 
-    @PostMapping("/creaRipetizione")
-    public ResponseEntity<Void> creaRipetizione(@Valid @RequestBody CreaReplicaDTO request)
+    @PostMapping("/venditore/creaRipetizione")
+    public ResponseEntity<Void> creaRipetizione(@Valid @RequestBody CreaReplicaDTO request, UsernamePasswordAuthenticationToken upat)
     {
         boolean creato = service.creaRepliche(request);
         return ResponseEntity.ok().build();

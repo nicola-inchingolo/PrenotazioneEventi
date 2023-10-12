@@ -5,8 +5,10 @@ import org.elis.softwareprenotazioneeventi.DTO.request.CreaRecensioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.RecensioneService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,37 +23,40 @@ public class RecensioneController {
         service = s;
     }
 
-    @GetMapping("/getAllRecensioni")
-    public ResponseEntity<List<GetAllRecensioniResponseDTO>> getAllRecensioni()
+    @GetMapping("/venditore/getAllRecensioni")//venditore o admin?
+    public ResponseEntity<List<GetAllRecensioniResponseDTO>> getAllRecensioni(UsernamePasswordAuthenticationToken upat)
     {
         return ResponseEntity.ok().body(service.getAllRecensioni());
     }
 
 
 
-    @PostMapping("/creaRecensione")
-    public ResponseEntity<Void> creaRecensione(@Valid @RequestBody CreaRecensioneRequestDTO request)
+    @PostMapping("/cliente/creaRecensione")//clienti
+    public ResponseEntity<Void> creaRecensione(@Valid @RequestBody CreaRecensioneRequestDTO request, UsernamePasswordAuthenticationToken upat)
     {
-        boolean creato = service.creaRecensione(request);
+        User u = (User) upat.getPrincipal();
+        boolean creato = service.creaRecensione(request, u);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/modificaVotazione")
-    public ResponseEntity<Void> modificaVotazione(@Valid @RequestBody ModificaVotazioneRequestDTO request)
+    @PatchMapping("/cliente/modificaVotazione")//clkiente controlla se l'authentication è uguale al cliente di cui modifico la votazione
+    public ResponseEntity<Void> modificaVotazione(@Valid @RequestBody ModificaVotazioneRequestDTO request, UsernamePasswordAuthenticationToken upat)
     {
-        boolean modificato = service.modificaVotazione(request);
+        User u = (User) upat.getPrincipal();
+        boolean modificato = service.modificaVotazione(request, u);
         return  ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/modificaDescrizione")
-    public ResponseEntity<Void> modificaDescrizione(@Valid @RequestBody ModificaDescrizioneRecensioneDTO request)
+    @PatchMapping("/cliente/modificaDescrizione")//cliente  controlla se l'authentication è uguale al cliente di cui modifico la votazion
+    public ResponseEntity<Void> modificaDescrizione(@Valid @RequestBody ModificaDescrizioneRecensioneDTO request, UsernamePasswordAuthenticationToken upat)
     {
-        boolean modificato = service.modificaDescrizione(request);
+        User u = (User) upat.getPrincipal();
+        boolean modificato = service.modificaDescrizione(request, u);
         return  ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/rimuoviRecensione")
-    public ResponseEntity<Void> rimuoviRecensione(@RequestParam long idRecensione)
+    @DeleteMapping("/venditore/rimuoviRecensione")//venditore o admin
+    public ResponseEntity<Void> rimuoviRecensione(@RequestParam long idRecensione, UsernamePasswordAuthenticationToken upat)
     {
         boolean eliminato = service.rimuoviRecensione(idRecensione);
         return ResponseEntity.ok().build();

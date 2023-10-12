@@ -37,7 +37,7 @@ public class TokenUtil {
         String dataNascita = u.getDataNascita().format(DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy"));
         String saluto = "ciao, hai letto i miei dati, e adesso ?";
 
-        long millisecondiDiDurata= 1000L*60*60*24*60;
+        long millisecondiDiDurata= 1000L*60*60*24*60; //quando scade il token
         return Jwts.builder().claims()
                 .add("ruolo", ruolo)
                 .add("dataNascita", dataNascita)
@@ -57,6 +57,7 @@ public class TokenUtil {
                 .build();
         return parser.parseSignedClaims(token)
                 .getPayload();
+
     }
 
     public String getSubject(String token) {return prendiClaimsDalToken(token).getSubject();}

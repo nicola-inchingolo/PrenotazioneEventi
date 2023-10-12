@@ -15,6 +15,6 @@ public class GetAllSezioniResponseDTO {
     private long id;
     private String nome;
     private String NomeLuogo;
-    private List<Posto> posti;
+    private List<String> nomeposti;
 
 }

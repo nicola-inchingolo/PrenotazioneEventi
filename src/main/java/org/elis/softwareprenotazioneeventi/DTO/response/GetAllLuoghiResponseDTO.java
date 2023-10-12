@@ -19,6 +19,6 @@ public class GetAllLuoghiResponseDTO {
     private String città;
     private String provincia;
     private String cap;
-    private List<Ripetizione> repliche;
-    private List<Sezione> sezioni;
+    private List<GetAllRipetizioneResponseDTO> repliche;
+    private List<GetAllSezioniResponseDTO> sezioni;
 }

@@ -11,8 +11,6 @@ public class CreaRecensioneRequestDTO {
     @NotNull
     private int votazione;
 
-    @NotNull
-    private long idUser;
 
     @NotNull
     private long idEvento;

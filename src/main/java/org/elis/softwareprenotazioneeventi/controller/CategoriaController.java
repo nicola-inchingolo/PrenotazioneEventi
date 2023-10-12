@@ -6,10 +6,8 @@ import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseD
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.service.definition.CategoriaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,17 +22,17 @@ public class CategoriaController {
         service = s;
     }
 
-    @GetMapping("/getAllCategorie")
+    @GetMapping("/all/getAllCategorie")
     public ResponseEntity<List<GetAllCategoriaResponseDTO>> getAllCategorie()
     {
         return ResponseEntity.ok().body(service.getAllCategorie());
     }
 
 
-    @PostMapping("/creaCategoria")
-    public ResponseEntity<Void> creaCategoria( @Valid @RequestBody CreaCategoriaRequestDTO request)
+    @PostMapping("/admin/creaCategoria")
+    public ResponseEntity<Void> creaCategoria( @Valid @RequestParam String nome, UsernamePasswordAuthenticationToken upat)
     {
-        boolean creato = service.creaCategoria(request);
+        boolean creato = service.creaCategoria(nome);
         return ResponseEntity.ok().build();
     }
 }

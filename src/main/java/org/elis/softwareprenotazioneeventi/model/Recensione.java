@@ -20,11 +20,9 @@ public class Recensione {
     private int votazione;
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    @JsonBackReference
     private User user;
     @ManyToOne
     @JoinColumn(name = "id_evento", nullable = false, updatable = false)
-    @JsonBackReference
     private Evento evento;
 
 }

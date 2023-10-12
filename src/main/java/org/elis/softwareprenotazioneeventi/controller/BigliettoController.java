@@ -1,17 +1,15 @@
 package org.elis.softwareprenotazioneeventi.controller;
 
 import jakarta.validation.Valid;
-import org.elis.softwareprenotazioneeventi.DTO.request.AggiungiCarrelloDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.BigliettoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaBigliettoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
-import org.elis.softwareprenotazioneeventi.model.Biglietto;
+import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.BigliettoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -25,67 +23,72 @@ public class BigliettoController {
         service = s;
     }
 
-    @GetMapping("/bigliettiVendutiPerEvento")
-    public ResponseEntity<Map<String, Integer>> bigliettiVendutiPerEvento()
+    @GetMapping("/venditore/bigliettiVendutiPerEvento")
+    public ResponseEntity<Map<String, Integer>> bigliettiVendutiPerEvento(UsernamePasswordAuthenticationToken upat)
     {
         Map<String , Integer> bigliettiVenduti = service.bigliettiVenduti();
         return ResponseEntity.ok().body(bigliettiVenduti);
 
     }
 
-    @PostMapping("/creaBiglietto")
-    public ResponseEntity<Void> creaBiglietto(@Valid @RequestBody BigliettoRequestDTO request)
+    @PostMapping("/venditore/creaBiglietto")
+    public ResponseEntity<Void> creaBiglietto(@Valid @RequestBody BigliettoRequestDTO request, UsernamePasswordAuthenticationToken upat)
     {
         boolean creato = service.creaBiglietto(request);
         return ResponseEntity.ok().build();
     }
 
 
-    @PostMapping("/aggiungiAlCarello")
-    public ResponseEntity<Void> aggiungiAlCarrello(@Valid @RequestBody AggiungiCarrelloDTO request)
+    @PostMapping("/cliente/aggiungiAlCarello")
+    public ResponseEntity<Void> aggiungiAlCarrello(@Valid @RequestParam long idBiglietto, UsernamePasswordAuthenticationToken upat)
     {
-        boolean aggiunto = service.aggiungiCarello(request);
+        User u = (User) upat.getPrincipal();
+        boolean aggiunto = service.aggiungiCarello(idBiglietto, u);
         return ResponseEntity.accepted().build();
     }
 
-    @DeleteMapping("/rimuoviCarello")
-    public  ResponseEntity<Void> rimuoviDalCarello(@Valid @RequestBody AggiungiCarrelloDTO request)
+    @DeleteMapping("/cliente/rimuoviCarello")
+    public  ResponseEntity<Void> rimuoviDalCarello(@Valid @RequestParam long idBiglietto, UsernamePasswordAuthenticationToken upat)
     {
-        boolean rimosso = service.rimuoviCarello(request);
+        User u = (User) upat.getPrincipal();
+        boolean rimosso = service.rimuoviCarello(idBiglietto, u);
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/confermaAcquisto")
-    public ResponseEntity<Void> confermaAcquisto( @Valid @RequestBody AggiungiCarrelloDTO request)
+    @PutMapping("/cliente/confermaAcquisto")
+    public ResponseEntity<Void> confermaAcquisto( @Valid @RequestParam long idBiglietto, UsernamePasswordAuthenticationToken upat)
     {
-        boolean acquistato = service.confermaAcquisto(request);
+        User u = (User) upat.getPrincipal();
+        boolean acquistato = service.confermaAcquisto(idBiglietto, u);
         return ResponseEntity.accepted().build();
     }
 
-    @PatchMapping("/annullaAcquisto")
-    public  ResponseEntity<Void> annullaAcquisto( @Valid @RequestBody AggiungiCarrelloDTO request)
+    @PatchMapping("/cliente/annullaAcquisto")
+    public  ResponseEntity<Void> annullaAcquisto( @Valid @RequestParam long idBiglietto, UsernamePasswordAuthenticationToken upat)
     {
-        boolean annullato = service.annullaAcquisto(request);
+        User u = (User) upat.getPrincipal();
+        boolean annullato = service.annullaAcquisto(idBiglietto, u);
         return ResponseEntity.accepted().build();
     }
 
-    @PatchMapping("/modificaBiglietto")
-    public ResponseEntity<Void> modificaBiglietto(@Valid @RequestBody ModificaBigliettoDTO request)
+    @PatchMapping("/venditore/modificaBiglietto")
+    public ResponseEntity<Void> modificaBiglietto(@Valid @RequestBody ModificaBigliettoDTO request, UsernamePasswordAuthenticationToken upat)
     {
         boolean modificato = service.modificaPrezzoBiglietto(request);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getAllBiglietti")
-    public ResponseEntity<List<GetAllBigliettiResponseDTO>> getAllBiglietti()
+    @GetMapping("/venditore/getAllBiglietti")
+    public ResponseEntity<List<GetAllBigliettiResponseDTO>> getAllBiglietti(UsernamePasswordAuthenticationToken upat)
     {
         return ResponseEntity.ok().body(service.getAllBiglietti());
     }
 
-    @GetMapping("/getStoricoBiglietti")
-    public ResponseEntity<List<GetAllBigliettiResponseDTO>> getStoricoBiglietti(@RequestParam long idUser)
+    @GetMapping("/cliente/getStoricoBiglietti")
+    public ResponseEntity<List<GetAllBigliettiResponseDTO>> getStoricoBiglietti(UsernamePasswordAuthenticationToken upat)
     {
-        return ResponseEntity.ok().body(service.getStoricoBiglietti(idUser));
+        User u = (User) upat.getPrincipal();
+        return ResponseEntity.ok().body(service.getStoricoBiglietti(u));
     }
 
 }

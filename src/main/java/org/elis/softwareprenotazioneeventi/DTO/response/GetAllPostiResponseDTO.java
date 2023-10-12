@@ -9,6 +9,8 @@ import lombok.Data;
 import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Sezione;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 public class GetAllPostiResponseDTO {
@@ -16,5 +18,6 @@ public class GetAllPostiResponseDTO {
     private long id;
     private String nome;
     private String sezioneNome;
-    private Biglietto biglietto;
+    private LocalDate Databiglietto;
+    private String NomeSpettacolo;
 }

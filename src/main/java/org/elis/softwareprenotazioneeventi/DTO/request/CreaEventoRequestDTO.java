@@ -20,7 +20,6 @@ public class CreaEventoRequestDTO {
     @Nullable
     private List<CreaCategoriaRequestDTO> categorie;
 
-    @NotNull
-    private long idUserRichiesta;
+
 
 }

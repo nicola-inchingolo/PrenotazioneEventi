@@ -28,14 +28,11 @@ public class Ripetizione {
     private LocalTime oraFine;
     @ManyToOne
     @JoinColumn(name = "id_evento", nullable = false, updatable = false)
-    @JsonBackReference
     private Evento evento;
     @ManyToOne
     @JoinColumn(name = "id_luogo", nullable = false)
-    @JsonBackReference
     private Luogo luogo;
     @OneToMany(mappedBy = "ripetizione", cascade = CascadeType.REMOVE)
-    @JsonManagedReference
     private List<Biglietto> biglietti;
 
     public Ripetizione(LocalDate datainizio, LocalDate datafine, LocalTime oraInizio, LocalTime oraFine, Evento evento) {

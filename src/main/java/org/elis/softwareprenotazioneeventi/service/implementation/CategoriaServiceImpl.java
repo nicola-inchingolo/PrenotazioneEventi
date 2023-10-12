@@ -3,6 +3,7 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaCategoriaRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.repository.CategoriaRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.CategoriaService;
@@ -26,12 +27,12 @@ public class CategoriaServiceImpl implements CategoriaService {
 
 
     @Override
-    public boolean creaCategoria(CreaCategoriaRequestDTO request) {
-        Optional<Categoria> c = categoriaRepository.findByNome(request.getNome());
+    public boolean creaCategoria(String nome) {
+        Optional<Categoria> c = categoriaRepository.findByNome(nome);
         if(c.isEmpty())
         {
             Categoria categoria = new Categoria();
-            categoria.setNome(request.getNome());
+            categoria.setNome(nome);
             categoriaRepository.save(categoria);
             return true;
         }
@@ -43,13 +44,13 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public List<GetAllCategoriaResponseDTO> getAllCategorie() {
+
         List<Categoria> categorie = categoriaRepository.findAll();
         List<GetAllCategoriaResponseDTO> response = new ArrayList<>();
 
         categorie.forEach(c->
         {
-            response.add(new GetAllCategoriaResponseDTO(c.getId(),c.getNome(),c.getEventi())
-
+            response.add(new GetAllCategoriaResponseDTO(c.getId(),c.getNome())
             );
 
         });

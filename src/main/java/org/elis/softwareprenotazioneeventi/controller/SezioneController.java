@@ -5,10 +5,8 @@ import org.elis.softwareprenotazioneeventi.DTO.request.SezioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
 import org.elis.softwareprenotazioneeventi.service.definition.SezioneService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,15 +21,15 @@ public class SezioneController {
         service = s;
     }
 
-    @GetMapping("/getAllSezioni")
-    public ResponseEntity<List<GetAllSezioniResponseDTO>> getAllSezioni()
+    @GetMapping("/venditore/getAllSezioni")// venditore o admin
+    public ResponseEntity<List<GetAllSezioniResponseDTO>> getAllSezioni(UsernamePasswordAuthenticationToken upat)
     {
         return ResponseEntity.ok().body(service.getAllSezioni());
     }
 
 
-    @PostMapping("/creaSezione")
-    public ResponseEntity<Void> creaSezione(@Valid @RequestBody SezioneRequestDTO request)
+    @PostMapping("/admin/creaSezione")//admin o superadmin
+    public ResponseEntity<Void> creaSezione(@Valid @RequestBody SezioneRequestDTO request, UsernamePasswordAuthenticationToken upat)
     {
         boolean creato = service.creazioneSezione(request);
         return ResponseEntity.ok().build();

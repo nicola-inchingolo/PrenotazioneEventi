@@ -1,15 +1,12 @@
 package org.elis.softwareprenotazioneeventi.service.definition;
 
-import org.elis.softwareprenotazioneeventi.DTO.request.AccountRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
@@ -20,8 +17,8 @@ public interface UserService {
     public List<GetAllUsersResponseDTO> findAllClienti();
     public List<GetAllUsersResponseDTO> findAllVenditori();
     public List<GetAllUsersResponseDTO> findAllAdmin();
-    public boolean bloccaAccount(AccountRequestDTO request);
-    public boolean sbloccaAccount(AccountRequestDTO request);
+    public boolean bloccaAccount(long idUser);
+    public boolean sbloccaAccount(long idUser);
     public List<GetAllUsersResponseDTO> getAllUsers();
     public boolean modificaPassword(ModificaPasswordRequestDTO request);
 

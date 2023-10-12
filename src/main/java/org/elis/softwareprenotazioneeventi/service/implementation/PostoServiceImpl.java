@@ -1,6 +1,7 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreapostoDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
@@ -62,7 +63,7 @@ public class PostoServiceImpl implements PostoService {
         posti.forEach(p ->
         {
             response.add(
-                    new GetAllPostiResponseDTO(p.getId(),p.getNome(),p.getSezione().getNome(), p.getBiglietto())
+                    new GetAllPostiResponseDTO(p.getId(),p.getNome(),p.getSezione().getNome(), p.getBiglietto().getRipetizione().getDatainizio(),p.getBiglietto().getRipetizione().getEvento().getNome())
             );
         });
         return response;

@@ -22,10 +22,8 @@ public class Sezione {
     private String nome;
     @ManyToOne
     @JoinColumn(name = "id_luogo", nullable = false)
-    @JsonBackReference
     private Luogo luogo;//SPRING CERCA DI serializzare la connessione tra i due stampando la lista in ciclo perciò la soluzione prevederebbe di non stampare tutto l'oggetto ma solo alcune cose
     @OneToMany(mappedBy = "sezione")
-    @JsonManagedReference
     private List<Posto> posti;
 
     public Sezione(String nome, Posto posto) {

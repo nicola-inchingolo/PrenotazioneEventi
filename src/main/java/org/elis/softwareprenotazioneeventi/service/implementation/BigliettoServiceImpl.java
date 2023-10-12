@@ -1,10 +1,8 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
-import org.elis.softwareprenotazioneeventi.DTO.request.AggiungiCarrelloDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.BigliettoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaBigliettoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.*;
 import org.elis.softwareprenotazioneeventi.repository.BigliettoRepository;
 import org.elis.softwareprenotazioneeventi.repository.PostoRepository;
@@ -64,12 +62,10 @@ public class BigliettoServiceImpl  implements BigliettoService {
     }
 
     @Override
-    public boolean aggiungiCarello(AggiungiCarrelloDTO request) {
-        Optional<User> u = userRepository.findById(request.getIdUser());
-        if(u.isPresent())
+    public boolean aggiungiCarello(long idBiglietto, User user) {
+        if(user != null)
         {
-            User user = u.get();
-            Optional<Biglietto> b = bigliettoRepository.findById(request.getIdBiglietto());
+            Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
 
             if(b.isPresent())
             {
@@ -105,15 +101,15 @@ public class BigliettoServiceImpl  implements BigliettoService {
     }
 
     @Override
-    public boolean confermaAcquisto(AggiungiCarrelloDTO request) {
-        Optional<User> u = userRepository.findById(request.getIdUser());
-        Optional<Biglietto> b = bigliettoRepository.findById(request.getIdBiglietto());
-        if(u.isPresent()) {
-            User user = u.get();
+    public boolean confermaAcquisto(long idBiglietto, User user) {
+        Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+        if(user != null) {
+
             if (b.isPresent()) {
                 Biglietto biglietto = b.get();
                 if (biglietto.getUtenti().contains(user) && !biglietto.getVenduto() && user.getCarrello().contains(biglietto))
                 {
+
                     biglietto.setVenduto(true);
                     user.getBigliettiAcquistati().add(biglietto);
                     biglietto.setUser(user);
@@ -145,11 +141,11 @@ public class BigliettoServiceImpl  implements BigliettoService {
 
 
     @Override
-    public boolean rimuoviCarello(AggiungiCarrelloDTO request) {
-        Optional<User> u = userRepository.findById(request.getIdUser());
-        Optional<Biglietto> b = bigliettoRepository.findById(request.getIdBiglietto());
-        if (u.isPresent()) {
-            User user = u.get();
+    public boolean rimuoviCarello(long idBiglietto, User user) {
+
+        Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+        if (user != null) {
+
             if (b.isPresent()) {
                 Biglietto biglietto = b.get();
                 if(biglietto.getUtenti().contains(user) && user.getCarrello().contains(biglietto)) {
@@ -176,11 +172,11 @@ public class BigliettoServiceImpl  implements BigliettoService {
     }
 
     @Override
-    public boolean annullaAcquisto(AggiungiCarrelloDTO request) {
-        Optional<User> u = userRepository.findById(request.getIdUser());
-        Optional<Biglietto> b = bigliettoRepository.findById(request.getIdBiglietto());
-        if (u.isPresent()) {
-            User user = u.get();
+    public boolean annullaAcquisto(long idBiglietto, User user) {
+
+        Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+        if (user != null) {
+
             if (b.isPresent()) {
                 Biglietto biglietto = b.get();
                 if (biglietto.getUser().getEmail().equals(user.getEmail()) && biglietto.getVenduto()) {
@@ -277,9 +273,9 @@ public class BigliettoServiceImpl  implements BigliettoService {
     }
 
     @Override
-    public List<GetAllBigliettiResponseDTO> getStoricoBiglietti(long id) {
+    public List<GetAllBigliettiResponseDTO> getStoricoBiglietti(User user) {
 
-        List<Biglietto> biglietti = bigliettoRepository.findAllByUser_Id(id);
+        List<Biglietto> biglietti = bigliettoRepository.findAllByUser_Id(user.getId());
         List<GetAllBigliettiResponseDTO> response = new ArrayList<>();
         biglietti.forEach( b-> {
                 response.add(new GetAllBigliettiResponseDTO(b.getId(),b.getPrezzo(),b.getVenduto(),b.getUser().getNome(),b.getPosto().getNome(),b.getRipetizione().getDatainizio(), b.getRipetizione().getEvento().getNome()));

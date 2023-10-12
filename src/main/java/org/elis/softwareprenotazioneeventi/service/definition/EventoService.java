@@ -2,6 +2,7 @@ package org.elis.softwareprenotazioneeventi.service.definition;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaEventoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
+import org.elis.softwareprenotazioneeventi.model.User;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CategoriaService {
 
-    public boolean creaCategoria(CreaCategoriaRequestDTO request);
+    public boolean creaCategoria(String nome);
 
     public List<GetAllCategoriaResponseDTO> getAllCategorie();
 

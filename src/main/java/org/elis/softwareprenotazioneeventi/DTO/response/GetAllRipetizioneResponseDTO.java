@@ -19,7 +19,6 @@ import java.util.List;
 public class GetAllRipetizioneResponseDTO {
 
     private long id;
-
     private LocalDate datainizio;
     private LocalDate datafine;
     private LocalTime oraInizio;

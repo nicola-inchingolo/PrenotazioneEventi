@@ -1,8 +1,10 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.SezioneRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Ripetizione;
 import org.elis.softwareprenotazioneeventi.model.Sezione;
@@ -60,17 +62,27 @@ public class SezioneServiceImpl implements SezioneService {
 
     @Override
     public List<GetAllSezioniResponseDTO> getAllSezioni() {
+
         List<Sezione> sezioni = sezioneRepository.findAll();
         List<GetAllSezioniResponseDTO> response = new ArrayList<>();
 
         sezioni.forEach(s ->
         {
+            List<String> posti = new ArrayList<>();
+            s.getPosti().forEach(po->{
+                 String posto = po.getNome();
+                posti.add(posto);
+            });
+
+
             response.add(
-                    new GetAllSezioniResponseDTO(s.getId(), s.getNome(), s.getLuogo().getNome(), s.getPosti())
+                    new GetAllSezioniResponseDTO(s.getId(), s.getNome(), s.getLuogo().getNome(),posti )
             );
         });
 
         return response;
+
+
     }
 
 

@@ -9,11 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.sql.rowset.serial.SerialException;
 import java.io.IOException;
-
+@Component
 public class FilterJwt extends OncePerRequestFilter {
 
     @Autowired
@@ -29,6 +30,7 @@ public class FilterJwt extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken upat =
                     new UsernamePasswordAuthenticationToken(u, null, u.getAuthorities());
             upat.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            System.out.println(upat);
             SecurityContextHolder.getContext().setAuthentication(upat);
         }
         filterChain.doFilter(request,response);
