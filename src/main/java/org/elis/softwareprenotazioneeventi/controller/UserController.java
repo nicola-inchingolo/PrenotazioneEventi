@@ -31,7 +31,7 @@ public class UserController {
         util = t;
     }
 
-    @GetMapping("/all/login")//tutti
+    @PostMapping("/all/login")//tutti
     public ResponseEntity<LoginResponseDTO> login( @Valid @RequestBody LoginRequestDTO request){
 
         User u= service.login(request);
@@ -78,7 +78,8 @@ public class UserController {
     @PutMapping("/admin/bloccaAccount")//admin o superadmin
     public ResponseEntity<Void> bloccaAccount(@Valid @RequestParam long idUser, UsernamePasswordAuthenticationToken upat)
     {
-        boolean bloccato = service.bloccaAccount(idUser);
+        User userRichiesta = (User) upat.getPrincipal();
+        boolean bloccato = service.bloccaAccount(idUser,userRichiesta);
         return ResponseEntity.ok().build();
         //else return ResponseEntity.badRequest().build();
     }
@@ -86,7 +87,8 @@ public class UserController {
     @PutMapping("/admin/sbloccaAccount")//admin o superadmin
     public ResponseEntity<Void> sbloccaAccount(@Valid @RequestParam long idUser,  UsernamePasswordAuthenticationToken upat)
     {
-        boolean sbloccato = service.sbloccaAccount(idUser);
+        User userRichiesta = (User) upat.getPrincipal();
+        boolean sbloccato = service.sbloccaAccount(idUser, userRichiesta);
         return ResponseEntity.ok().build();
         //else return ResponseEntity.badRequest().build();
     }

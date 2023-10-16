@@ -43,35 +43,34 @@ public class RecensioneServiceImpl implements  RecensioneService{
 
         Optional<Evento> evento = eventoRepository.findById(request.getIdEvento());
 
+        if(user.getAttivo()) {
 
+            if (evento.isPresent()) {
+                List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.getEmail(), evento.get().getNome());
+                if (!biglietti.isEmpty()) {
+                    Recensione recensione = new Recensione();
+                    recensione.setDescrizione(request.getDescrizione());
+                    recensione.setVotazione(request.getVotazione());
+                    recensione.setUser(user);
+                    recensione.setEvento(evento.get());
 
+                    user.getRecensioni().add(recensione);
+                    evento.get().getRecensioni().add(recensione);
 
-        if(evento.isPresent())
-        {
-            List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.getEmail(), evento.get().getNome());
-            if(!biglietti.isEmpty()) {
-                Recensione recensione = new Recensione();
-                recensione.setDescrizione(request.getDescrizione());
-                recensione.setVotazione(request.getVotazione());
-                recensione.setUser(user);
-                recensione.setEvento(evento.get());
-
-                user.getRecensioni().add(recensione);
-                evento.get().getRecensioni().add(recensione);
-
-                recensioneRepository.save(recensione);
-                userRepository.save(user);
-                eventoRepository.save(evento.get());
-                return true;
-            }
-            else
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente deve aver partecipato all'evento");
+                    recensioneRepository.save(recensione);
+                    userRepository.save(user);
+                    eventoRepository.save(evento.get());
+                    return true;
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente deve aver partecipato all'evento");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
             }
         }
         else
         {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è stato bloccato");
         }
     }
 
@@ -94,20 +93,21 @@ public class RecensioneServiceImpl implements  RecensioneService{
 
         Optional<Recensione> r = recensioneRepository.findById(request.getIdRecensione());
 
-        if(r.isPresent())
-        {
-            if(r.get().getUser().equals(user)) {
-                r.get().setVotazione(request.getNewVotazione());
-                return true;
-            }
-            else
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+        if(user.getAttivo()) {
+
+            if (r.isPresent()) {
+                if (r.get().getUser().equals(user)) {
+                    r.get().setVotazione(request.getNewVotazione());
+                    return true;
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
             }
         }
-        else
-        {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è stato bloccato");
         }
     }
 
@@ -116,20 +116,22 @@ public class RecensioneServiceImpl implements  RecensioneService{
 
         Optional<Recensione> r = recensioneRepository.findById(request.getIdRecensione());
 
-        if(r.isPresent())
-        {
-            if(r.get().getUser().equals(user)) {
-                r.get().setDescrizione(request.getNewDescrizione());
-                return true;
-            }
-            else
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+        if(user.getAttivo()) {
+
+            if (r.isPresent()) {
+                if (r.get().getUser().equals(user)) {
+                    r.get().setDescrizione(request.getNewDescrizione());
+                    return true;
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non sei autorizzato a modificare la recensione di un altro utente");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
             }
         }
         else
         {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qualcosa è andato storto");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"l'utente è stato bloccato");
         }
 
     }

@@ -2,6 +2,7 @@ package org.elis.softwareprenotazioneeventi.security;
 
 
 import org.elis.softwareprenotazioneeventi.model.Role;
+import org.elis.softwareprenotazioneeventi.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -42,11 +43,12 @@ public class GestoreDellaFilterChain {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .headers(cust->cust.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers(builder.pattern("/h2-console/**")).permitAll()
-                        .requestMatchers(builder.pattern("/all/**")).permitAll()
-                        .requestMatchers(builder.pattern("/cliente/**")).hasRole(Role.CLIENTE.toString())
-                        .requestMatchers(builder.pattern("/venditore/**")).hasRole(Role.VENDITORE.toString())
-                        .requestMatchers(builder.pattern("/admin/**")).hasAnyRole(Role.ADMIN.toString(),Role.SUPERADMIN.toString())
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/all/**").permitAll()
+                        .requestMatchers("/cliente/**").hasRole(Role.CLIENTE.toString())
+                        .requestMatchers("/venditore/**").hasAnyRole(Role.VENDITORE.toString(),Role.ADMIN.toString(),Role.SUPERADMIN.toString())
+                        .requestMatchers("/admin/**").hasAnyRole(Role.ADMIN.toString(),Role.SUPERADMIN.toString())
+                        .requestMatchers("/superadmin/**").hasRole(Role.SUPERADMIN.toString())
                         .anyRequest().permitAll()
                 ).sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(AbstractHttpConfigurer::disable)

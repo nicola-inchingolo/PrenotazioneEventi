@@ -6,9 +6,11 @@ import org.elis.softwareprenotazioneeventi.DTO.request.ModificaBigliettoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.BigliettoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -26,9 +28,8 @@ public class BigliettoController {
     @GetMapping("/venditore/bigliettiVendutiPerEvento")
     public ResponseEntity<Map<String, Integer>> bigliettiVendutiPerEvento(UsernamePasswordAuthenticationToken upat)
     {
-        Map<String , Integer> bigliettiVenduti = service.bigliettiVenduti();
-        return ResponseEntity.ok().body(bigliettiVenduti);
-
+            Map<String, Integer> bigliettiVenduti = service.bigliettiVenduti();
+            return ResponseEntity.ok().body(bigliettiVenduti);
     }
 
     @PostMapping("/venditore/creaBiglietto")

@@ -313,25 +313,25 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override//da rivedere
-    public boolean bloccaAccount(long idUser) {
+    public boolean bloccaAccount(long idUser, User userRichiesta) {
 
        Optional<User> user = userRepository.findById(idUser);
        /*Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());*/
 
-       if(user.isPresent() /*&& userRichiesta.isPresent()*/) {
+       if(user.isPresent() && userRichiesta!=null) {
 
            if (user.get().getAttivo()) {
-               /*if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {*/
+               if (userRichiesta.getRuolo().equals(Role.SUPERADMIN)) {
                    user.get().setAttivo(false);
                    userRepository.save(user.get());
                    return true;
-               /*} else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
+               } else if (userRichiesta.getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
                    user.get().setAttivo(false);
                    userRepository.save(user.get());
                    return true;
                }
                else { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");}
-           */}
+           }
            else {
                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è già disattivo");
            }
@@ -344,18 +344,18 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
-    public boolean sbloccaAccount(long idUser) {
+    public boolean sbloccaAccount(long idUser, User userRichiesta) {
 
         Optional<User> user = userRepository.findById(idUser);
        /* Optional<User> userRichiesta = userRepository.findById(request.getIdUserRichiesta());*/
 
-        if(user.isPresent() /*&& userRichiesta.isPresent()*/) {
+        if(user.isPresent() && userRichiesta!=null) {
             if (!user.get().getAttivo()) {
-               /* if (userRichiesta.get().getRuolo().equals(Role.SUPERADMIN)) {*/
+               if (userRichiesta.getRuolo().equals(Role.SUPERADMIN)) {
                     user.get().setAttivo(true);
                     userRepository.save(user.get());
                     return true;
-                /*} else if (userRichiesta.get().getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
+                } else if (userRichiesta.getRuolo().equals(Role.ADMIN) && (user.get().getRuolo().equals(Role.VENDITORE) || user.get().getRuolo().equals(Role.CLIENTE))) {
                     user.get().setAttivo(true);
                     userRepository.save(user.get());
                     return true;
@@ -363,7 +363,7 @@ public class UserServiceimpl implements UserService {
                 else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non è autorizzato a svolgere quest'azione");
                 }
-            */}
+            }
             else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è già attivo");
             }
@@ -413,14 +413,19 @@ public class UserServiceimpl implements UserService {
 
         if(u.isPresent())
         {
-            User user = u.get();
-            if(PasswordValidator.isValidPassword(request.getNewPassword())) {
-                user.setPassword(request.getNewPassword());
-                userRepository.save(user);
-                return true;
+            if(u.get().getAttivo()) {
+                User user = u.get();
+                if (PasswordValidator.isValidPassword(request.getNewPassword())) {
+                    user.setPassword(request.getNewPassword());
+                    userRepository.save(user);
+                    return true;
+                } else {
+                    return false;
+                }
             }
-            else {
-                return false;
+            else
+            {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente è stato bloccato");
             }
         }
         else

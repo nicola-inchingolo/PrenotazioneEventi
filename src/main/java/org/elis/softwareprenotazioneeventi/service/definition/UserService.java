@@ -17,8 +17,8 @@ public interface UserService {
     public List<GetAllUsersResponseDTO> findAllClienti();
     public List<GetAllUsersResponseDTO> findAllVenditori();
     public List<GetAllUsersResponseDTO> findAllAdmin();
-    public boolean bloccaAccount(long idUser);
-    public boolean sbloccaAccount(long idUser);
+    public boolean bloccaAccount(long idUser, User userRichiesta);
+    public boolean sbloccaAccount(long idUser, User userRichiesta);
     public List<GetAllUsersResponseDTO> getAllUsers();
     public boolean modificaPassword(ModificaPasswordRequestDTO request);
 
