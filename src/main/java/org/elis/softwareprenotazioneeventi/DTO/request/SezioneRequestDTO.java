@@ -10,6 +10,7 @@ public class SezioneRequestDTO {
     @NotBlank(message = "nome non deve essere null")
     private String nome;
 
+
     @NotNull
     private long idLuogo;
 }

@@ -6,3 +6,8 @@ values
 ('Edoardo','Loconte','edoardo.loconte@gmail.com','Password!4','2003-04-17','EDRLCN03M17S664Z',0,true),
 ('Edo','Locoe','do.locote@gmail.com','Password!5','2003-04-17','EDRLCN03M17S664Z',0,false),
 ('kanguro','king','k.k@gmail.com','Password!6','2003-04-17','EDRLCN03M17S664Z',0,false);
+
+
+insert into Luogo(nome,via,città,provincia,cap)
+values
+('Colosseo', 'via del Corso', 'ROMA', 'RM', 00159);
