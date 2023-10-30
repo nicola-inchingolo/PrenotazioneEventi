@@ -4,9 +4,6 @@ import jakarta.validation.Valid;
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaEventoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.FiltroAvanzato;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructEvento;
-import org.elis.softwareprenotazioneeventi.model.Evento;
-import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.EventoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +20,7 @@ public class EventoController {
     EventoService service;
 
 
-    public EventoController(EventoService s, MapStructEvento m)
+    public EventoController(EventoService s)
     {
         service = s;
     }

@@ -6,8 +6,6 @@ import org.elis.softwareprenotazioneeventi.DTO.request.FiltroRecensione;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructRecensione;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.RecensioneService;
 import org.springframework.http.HttpStatus;

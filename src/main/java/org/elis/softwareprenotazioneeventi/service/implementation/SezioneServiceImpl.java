@@ -1,13 +1,9 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.SezioneRequestDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructSezione;
-import org.elis.softwareprenotazioneeventi.model.Biglietto;
+import org.elis.softwareprenotazioneeventi.Mapper.SezioneMapper;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
-import org.elis.softwareprenotazioneeventi.model.Ripetizione;
 import org.elis.softwareprenotazioneeventi.model.Sezione;
 import org.elis.softwareprenotazioneeventi.repository.LuogoRepository;
 import org.elis.softwareprenotazioneeventi.repository.SezioneRepository;
@@ -25,12 +21,14 @@ public class SezioneServiceImpl implements SezioneService {
 
     private SezioneRepository sezioneRepository;
     private LuogoRepository luogoRepository;
+    private final SezioneMapper sezioneMapper;
 
 
-    public SezioneServiceImpl(SezioneRepository s, LuogoRepository l)
+    public SezioneServiceImpl(SezioneRepository s, LuogoRepository l, SezioneMapper m)
     {
         sezioneRepository = s;
         luogoRepository = l;
+        sezioneMapper = m;
     }
 
     public boolean creazioneSezione(SezioneRequestDTO request)
@@ -43,10 +41,10 @@ public class SezioneServiceImpl implements SezioneService {
                     .anyMatch(sl -> request.getNome().equals(sl.getNome()));
 
             if (sezioniLuogo.isEmpty() || !esiste ) {
-                Sezione sezione = new Sezione();
-                /*sezione.setNome(request.getNome());
-                sezione.setLuogo(luogo.get());*/
-                sezione = mapStructSezione.fromSezioneRequestDTO(request);
+                Sezione sezione = sezioneMapper.toSezioneRequestDTO(request);
+               // sezione.setNome(request.getNome());
+                sezione.setLuogo(luogo.get());
+               // sezione = mapStructSezione.fromSezioneRequestDTO(request);
                 luogo.get().getSezioni().add(sezione);
                 sezioneRepository.save(sezione);
                 luogoRepository.save(luogo.get());

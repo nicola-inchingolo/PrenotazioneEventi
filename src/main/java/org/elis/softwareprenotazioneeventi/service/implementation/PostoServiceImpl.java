@@ -1,11 +1,8 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreapostoDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructPosto;
-import org.elis.softwareprenotazioneeventi.model.Luogo;
+import org.elis.softwareprenotazioneeventi.Mapper.PostoMapper;
 import org.elis.softwareprenotazioneeventi.model.Posto;
 import org.elis.softwareprenotazioneeventi.model.Sezione;
 import org.elis.softwareprenotazioneeventi.repository.PostoRepository;
@@ -24,12 +21,14 @@ public class PostoServiceImpl implements PostoService {
 
     PostoRepository postoRepository;
     SezioneRepository sezioneRepository;
+    private final PostoMapper postoMapper;
 
 
-    public PostoServiceImpl(PostoRepository p, SezioneRepository s)
+    public PostoServiceImpl(PostoRepository p, SezioneRepository s, PostoMapper m)
     {
         postoRepository = p;
         sezioneRepository = s;
+        postoMapper = m;
     }
 
     @Override
@@ -40,9 +39,9 @@ public class PostoServiceImpl implements PostoService {
         if(sezione.isPresent()) {
             Optional<Posto> p = postoRepository.findPostoByNomeAndAndSezione_Nome(request.getNome(), sezione.get().getNome());
             if (p.isEmpty()) {
-                Posto posto = new Posto();
-               /* posto.setNome(request.getNome());*/
-                posto = mapStructPosto.fromCreaPostoDTO(request);
+                Posto posto = postoMapper.toPostoRequestDTO(request);
+                //posto.setNome(request.getNome());
+               // posto = mapStructPosto.fromCreaPostoDTO(request);
                 posto.setSezione(sezione.get());
                 postoRepository.save(posto);
                 return true;

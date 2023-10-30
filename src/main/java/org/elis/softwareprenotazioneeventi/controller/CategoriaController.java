@@ -1,9 +1,7 @@
 package org.elis.softwareprenotazioneeventi.controller;
 
 import jakarta.validation.Valid;
-import org.elis.softwareprenotazioneeventi.DTO.request.CreaCategoriaRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
-import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.service.definition.CategoriaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

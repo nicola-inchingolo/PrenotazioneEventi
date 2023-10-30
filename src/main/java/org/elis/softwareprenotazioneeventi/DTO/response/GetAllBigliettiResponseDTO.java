@@ -6,6 +6,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.elis.softwareprenotazioneeventi.model.Posto;
 import org.elis.softwareprenotazioneeventi.model.Ripetizione;
 import org.elis.softwareprenotazioneeventi.model.User;

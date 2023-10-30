@@ -5,11 +5,9 @@ import org.elis.softwareprenotazioneeventi.DTO.request.FiltroAvanzato;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructEvento;
+import org.elis.softwareprenotazioneeventi.Mapper.EventoMapper;
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.model.Evento;
-import org.elis.softwareprenotazioneeventi.model.Role;
-import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.repository.CategoriaRepository;
 import org.elis.softwareprenotazioneeventi.repository.CriteriaUserRepository;
 import org.elis.softwareprenotazioneeventi.repository.EventoRepository;
@@ -31,13 +29,15 @@ public class EventoServiceImpl implements EventoService {
     private CategoriaRepository categoriaRepository;
     private UserRepository userRepository;
     private CriteriaUserRepository criteriaUserRepository;
+    private final EventoMapper eventoMapper;
 
-    public EventoServiceImpl(EventoRepository e, UserRepository u, CategoriaRepository c, CriteriaUserRepository cr)
+    public EventoServiceImpl(EventoRepository e, UserRepository u, CategoriaRepository c, CriteriaUserRepository cr, EventoMapper m)
     {
         categoriaRepository = c;
         eventoRepository = e;
         userRepository = u;
         criteriaUserRepository = cr;
+        eventoMapper = m;
     }
 
     @Override
@@ -46,7 +46,8 @@ public class EventoServiceImpl implements EventoService {
 
                 Optional<Evento> ev = eventoRepository.findByNome(request.getNome());
                 if (ev.isEmpty()) {
-                    Evento evento = mapStructEvento.fromCreaEventoRequestDTO(request);
+                    Evento evento = eventoMapper.toEventoRequestDTO(request);
+
                     List<Categoria> categorie = new ArrayList<>();
 
                     if(request.getCategorie() != null) {

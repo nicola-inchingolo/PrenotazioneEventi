@@ -1,17 +1,15 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
-import jakarta.transaction.Transactional;
 import org.elis.softwareprenotazioneeventi.DTO.request.BigliettoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaBigliettoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructBiglietto;
+import org.elis.softwareprenotazioneeventi.Mapper.BigliettoMapper;
 import org.elis.softwareprenotazioneeventi.model.*;
 import org.elis.softwareprenotazioneeventi.repository.BigliettoRepository;
 import org.elis.softwareprenotazioneeventi.repository.PostoRepository;
 import org.elis.softwareprenotazioneeventi.repository.RipetizioneRepository;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.BigliettoService;
-import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,15 +25,17 @@ public class BigliettoServiceImpl  implements BigliettoService {
     private UserRepository userRepository;
     private PostoRepository postoRepository;
     private RipetizioneRepository ripetizioneRepository;
+    private final BigliettoMapper bigliettoMapper;
 
 
 
-    public BigliettoServiceImpl(BigliettoRepository b, UserRepository u, PostoRepository p, RipetizioneRepository r)
+    public BigliettoServiceImpl(BigliettoRepository b, UserRepository u, PostoRepository p, RipetizioneRepository r, BigliettoMapper m)
     {
         userRepository = u;
         bigliettoRepository = b;
         postoRepository = p;
         ripetizioneRepository = r;
+        bigliettoMapper = m;
     }
     @Override
     public boolean creaBiglietto(BigliettoRequestDTO request) {
@@ -47,10 +47,10 @@ public class BigliettoServiceImpl  implements BigliettoService {
 
             Optional<Biglietto> b = bigliettoRepository.findByPosto_NomeAndPosto_Sezione_Id(posto.get().getNome(), posto.get().getSezione().getId());
             if (b.isEmpty()) {
-                Biglietto biglietto = new Biglietto();
-               /* biglietto.setPosto(posto.get());
-                biglietto.setPrezzo(request.getPrezzo());*/
-                biglietto = mapStructBiglietto.fromCreaBigliettorequestDTO(request);
+                Biglietto biglietto = bigliettoMapper.toBigliettoRequestDTO(request);
+                biglietto.setPosto(posto.get());
+                //biglietto.setPrezzo(request.getPrezzo());
+                //biglietto = mapStructBiglietto.fromCreaBigliettorequestDTO(request);
                 biglietto.setRipetizione(ripetizione.get());
                 bigliettoRepository.save(biglietto);
                 return true;
@@ -79,6 +79,7 @@ public class BigliettoServiceImpl  implements BigliettoService {
                 if(!biglietto.getVenduto()) {
                     if (biglietto.getUser() == null || (user != biglietto.getUser())  ) {
                         user.getCarrello().add(biglietto);
+                        biglietto.getUtenti().add(user);
                         userRepository.save(user);
                         return true;
                     }
@@ -115,9 +116,8 @@ public class BigliettoServiceImpl  implements BigliettoService {
 
             if (b.isPresent()) {
                 Biglietto biglietto = b.get();
-                System.out.println(user.getCarrello());
-                System.out.println(user.getCarrello().contains(biglietto));
-                if (user.getCarrello().contains(biglietto) && !biglietto.getVenduto() )
+
+                if ((user != biglietto.getUser()) && !biglietto.getVenduto() )
                 {
 
                     biglietto.setVenduto(true);
@@ -154,6 +154,7 @@ public class BigliettoServiceImpl  implements BigliettoService {
     public boolean rimuoviCarello(long idBiglietto, User user) {
 
         Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+
         if (user != null) {
 
             if (b.isPresent()) {
@@ -185,6 +186,8 @@ public class BigliettoServiceImpl  implements BigliettoService {
     public boolean annullaAcquisto(long idBiglietto, User user) {
 
         Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+        user = userRepository.findById(user.getId()).get();
+
         if (user != null) {
 
             if (b.isPresent()) {

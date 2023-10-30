@@ -1,9 +1,8 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaReplicaDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructRipetizione;
+import org.elis.softwareprenotazioneeventi.Mapper.RipetizioneMapper;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Ripetizione;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,12 +25,15 @@ public class RipetizioneServiceImpl implements RipetizioneService {
     EventoRepository eventoRepository;
     LuogoRepository luogoRepository;
 
+    private final RipetizioneMapper ripetizioneMapper;
 
-    public RipetizioneServiceImpl(RipetizioneRepository r, EventoRepository e, LuogoRepository l)
+
+    public RipetizioneServiceImpl(RipetizioneRepository r, EventoRepository e, LuogoRepository l, RipetizioneMapper ri)
     {
         eventoRepository = e;
         ripetizioneRepository = r;
         luogoRepository = l;
+        ripetizioneMapper = ri;
 
     }
 
@@ -50,12 +51,12 @@ public class RipetizioneServiceImpl implements RipetizioneService {
              /*if(request.getDataInizio().isAfter(LocalDate.now())) {*/
                  if(request.getDataFine().isAfter(request.getDataInizio())) {
                      if(request.getOraFine().isAfter(request.getOraInizio())) {
-                         Ripetizione ripetizione = new Ripetizione();
-                         /*ripetizione.setDatainizio(request.getDataInizio());
+                         Ripetizione ripetizione = ripetizioneMapper.toRipetizioneRequestDTO(request) ;
+                        /* ripetizione.setDatainizio(request.getDataInizio());
                          ripetizione.setDatafine(request.getDataFine());
                          ripetizione.setOraInizio(request.getOraInizio());
-                         ripetizione.setOraFine(request.getOraFine());*/
-                         ripetizione = mapStructRipetizione.fromCreaReplicaDTO(request);
+                         ripetizione.setOraFine(request.getOraFine()); */
+                         //ripetizione = mapStructRipetizione.fromCreaReplicaDTO(request);
                          ripetizione.setEvento(evento.get());
                          ripetizione.setLuogo(luogo.get());
                          ripetizioneRepository.save(ripetizione);

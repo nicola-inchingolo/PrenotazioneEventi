@@ -5,7 +5,7 @@ import org.elis.softwareprenotazioneeventi.DTO.request.FiltroRecensione;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructRecensione;
+import org.elis.softwareprenotazioneeventi.Mapper.RecensioneMapper;
 import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Recensione;
@@ -28,14 +28,16 @@ public class RecensioneServiceImpl implements  RecensioneService{
     EventoRepository eventoRepository;
     BigliettoRepository bigliettoRepository;
     CriteriaUserRepository criteriaUserRepository;
+    private final RecensioneMapper recensioneMapper;
 
-    public RecensioneServiceImpl(RecensioneRepository r, UserRepository u, EventoRepository e, BigliettoRepository b, CriteriaUserRepository c)
+    public RecensioneServiceImpl(RecensioneRepository r, UserRepository u, EventoRepository e, BigliettoRepository b, CriteriaUserRepository c, RecensioneMapper m)
     {
         recensioneRepository = r;
         userRepository = u;
         eventoRepository = e;
         bigliettoRepository = b;
         criteriaUserRepository=c;
+        recensioneMapper = m;
     }
 
     @Override
@@ -48,13 +50,12 @@ public class RecensioneServiceImpl implements  RecensioneService{
             if (evento.isPresent()) {
                 List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.getEmail(), evento.get().getNome());
                 if (!biglietti.isEmpty()) {
-                    Recensione recensione = new Recensione();
+                    Recensione recensione = recensioneMapper.toRecensioneRequestDTO(request);
                     /*recensione.setDescrizione(request.getDescrizione());
                     recensione.setVotazione(request.getVotazione());*/
-                    recensione = mapStructRecensione.fromCreaRecensioneRequestDTO(request);
+                    //recensione = mapStructRecensione.fromCreaRecensioneRequestDTO(request);
                     recensione.setUser(user);
                     recensione.setEvento(evento.get());
-
                     user.getRecensioni().add(recensione);
                     evento.get().getRecensioni().add(recensione);
 

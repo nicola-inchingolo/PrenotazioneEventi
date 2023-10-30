@@ -3,12 +3,13 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elis.softwareprenotazioneeventi.DTO.request.FiltroUser;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.*;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructUser;
 import org.elis.softwareprenotazioneeventi.Mapper.UserMapper;
 import org.elis.softwareprenotazioneeventi.exception.gestori.UserNotFoundException;
 import org.elis.softwareprenotazioneeventi.model.Role;
@@ -38,6 +39,7 @@ public class UserServiceimpl implements UserService {
     private CriteriaUserRepository criteriaUserRepository;
 
     private final Validator validator;
+    private final static Logger logger = LogManager.getLogger(UserServiceimpl.class.getName());
 
     private final UserMapper userMapper;
     public UserServiceimpl(UserRepository repository, Validator v, CriteriaUserRepository c, UserMapper u)
@@ -408,15 +410,18 @@ public class UserServiceimpl implements UserService {
         users.forEach(u -> {
 
             List<GetAllBigliettiResponseDTO> carrello = new ArrayList<>();
-            u.getCarrello().forEach(ca->{
 
-                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(ca.getId(),ca.getPrezzo(),ca.getVenduto(),ca.getUser().getNome(),ca.getPosto().getNome(),ca.getRipetizione().getDatainizio(),ca.getRipetizione().getEvento().getNome());
+            logger.info(u.getEmail());
+            logger.info((u.getCarrello()));
+            u.getCarrello().forEach(biglietto->{
+
+                GetAllBigliettiResponseDTO bigliettoCarrello = new GetAllBigliettiResponseDTO(biglietto.getId(),biglietto.getPrezzo(),biglietto.getVenduto(),biglietto.getUser()==null?null:biglietto.getUser().getNome(),biglietto.getPosto().getNome(),biglietto.getRipetizione().getDatainizio(),biglietto.getRipetizione().getEvento().getNome());
                 carrello.add(bigliettoCarrello);
             });
             List<GetAllBigliettiResponseDTO> acquistati = new ArrayList<>();
             u.getBigliettiAcquistati().forEach(ba->{
 
-                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
+                GetAllBigliettiResponseDTO bigliettoAcquistato = new GetAllBigliettiResponseDTO(ba.getId(),ba.getPrezzo(),ba.getVenduto(),ba.getUser()==null?null:ba.getUser().getNome(),ba.getPosto().getNome(),ba.getRipetizione().getDatainizio(),ba.getRipetizione().getEvento().getNome());
                 acquistati.add(bigliettoAcquistato);
             });
             List<GetAllRecensioniResponseDTO> recensioni = new ArrayList<>();

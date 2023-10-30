@@ -7,7 +7,6 @@ import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDT
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
-import org.elis.softwareprenotazioneeventi.Mapper.MapStructUser;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.security.TokenUtil;
 import org.elis.softwareprenotazioneeventi.service.definition.UserService;
@@ -27,7 +26,7 @@ public class UserController {
     private final UserService service;
     private final TokenUtil util;
 
-    public UserController(UserService s, TokenUtil t, MapStructUser m)
+    public UserController(UserService s, TokenUtil t)
     {
         service = s;
         util = t;

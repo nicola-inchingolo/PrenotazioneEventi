@@ -1,9 +1,7 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
-import org.elis.softwareprenotazioneeventi.DTO.request.CreaCategoriaRequestDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
-import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.CategoriaMapper;
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.repository.CategoriaRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.CategoriaService;
@@ -20,7 +18,9 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     private CategoriaRepository categoriaRepository;
 
-    public CategoriaServiceImpl(CategoriaRepository c)
+
+
+    public CategoriaServiceImpl(CategoriaRepository c, CategoriaMapper m)
     {
         categoriaRepository = c;
     }

@@ -4,9 +4,8 @@ import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
 import org.elis.softwareprenotazioneeventi.model.User;
-import org.mapstruct.Mapper;
 
-@Mapper
+/*@Mapper
 public interface MapStructUser {
 
 
@@ -17,3 +16,4 @@ public interface MapStructUser {
 
 
 }
+*/
