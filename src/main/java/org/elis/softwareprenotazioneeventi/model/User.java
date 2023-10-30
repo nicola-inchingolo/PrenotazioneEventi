@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Biglietto> bigliettiAcquistati;
     @ManyToMany(mappedBy = "utenti")
-    private List<Biglietto> Carrello;
+    private List<Biglietto> carrello;
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Recensione> recensioni;
 

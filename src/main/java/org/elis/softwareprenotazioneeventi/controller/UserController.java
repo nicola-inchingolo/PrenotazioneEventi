@@ -1,11 +1,13 @@
 package org.elis.softwareprenotazioneeventi.controller;
 
 import jakarta.validation.Valid;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroUser;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.LoginResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructUser;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.security.TokenUtil;
 import org.elis.softwareprenotazioneeventi.service.definition.UserService;
@@ -25,7 +27,7 @@ public class UserController {
     private final UserService service;
     private final TokenUtil util;
 
-    public UserController(UserService s, TokenUtil t)
+    public UserController(UserService s, TokenUtil t, MapStructUser m)
     {
         service = s;
         util = t;
@@ -123,4 +125,12 @@ public class UserController {
     {
         return ResponseEntity.ok().body(service.findAllAdmin());
     }
+
+    @PostMapping("/all/UserFiltrati")
+    public ResponseEntity<List<GetAllUsersResponseDTO>> UserFiltrati(@RequestBody FiltroUser request)
+    {
+        List<GetAllUsersResponseDTO> users = service.getUsersFiltrati(request).stream().map(GetAllUsersResponseDTO::new).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
 }

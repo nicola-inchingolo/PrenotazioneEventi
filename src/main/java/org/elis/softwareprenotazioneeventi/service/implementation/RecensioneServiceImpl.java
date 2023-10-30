@@ -1,17 +1,16 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaRecensioneRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroRecensione;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructRecensione;
 import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Recensione;
 import org.elis.softwareprenotazioneeventi.model.User;
-import org.elis.softwareprenotazioneeventi.repository.BigliettoRepository;
-import org.elis.softwareprenotazioneeventi.repository.EventoRepository;
-import org.elis.softwareprenotazioneeventi.repository.RecensioneRepository;
-import org.elis.softwareprenotazioneeventi.repository.UserRepository;
+import org.elis.softwareprenotazioneeventi.repository.*;
 import org.elis.softwareprenotazioneeventi.service.definition.RecensioneService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,15 +26,16 @@ public class RecensioneServiceImpl implements  RecensioneService{
     RecensioneRepository recensioneRepository;
     UserRepository userRepository;
     EventoRepository eventoRepository;
-
     BigliettoRepository bigliettoRepository;
+    CriteriaUserRepository criteriaUserRepository;
 
-    public RecensioneServiceImpl(RecensioneRepository r, UserRepository u, EventoRepository e, BigliettoRepository b)
+    public RecensioneServiceImpl(RecensioneRepository r, UserRepository u, EventoRepository e, BigliettoRepository b, CriteriaUserRepository c)
     {
         recensioneRepository = r;
         userRepository = u;
         eventoRepository = e;
         bigliettoRepository = b;
+        criteriaUserRepository=c;
     }
 
     @Override
@@ -49,8 +49,9 @@ public class RecensioneServiceImpl implements  RecensioneService{
                 List<Biglietto> biglietti = bigliettoRepository.findAllByUser_EmailAndAndRipetizione_Evento_Nome(user.getEmail(), evento.get().getNome());
                 if (!biglietti.isEmpty()) {
                     Recensione recensione = new Recensione();
-                    recensione.setDescrizione(request.getDescrizione());
-                    recensione.setVotazione(request.getVotazione());
+                    /*recensione.setDescrizione(request.getDescrizione());
+                    recensione.setVotazione(request.getVotazione());*/
+                    recensione = mapStructRecensione.fromCreaRecensioneRequestDTO(request);
                     recensione.setUser(user);
                     recensione.setEvento(evento.get());
 
@@ -148,6 +149,11 @@ public class RecensioneServiceImpl implements  RecensioneService{
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "recensione non esistente");
         }
+    }
+
+    @Override
+    public List<Recensione> getRecensioniFiltrate(FiltroRecensione request) {
+        return criteriaUserRepository.getRecensioniFiltrate(request);
     }
 
 

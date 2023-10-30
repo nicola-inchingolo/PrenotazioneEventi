@@ -2,9 +2,13 @@ package org.elis.softwareprenotazioneeventi.controller;
 
 import jakarta.validation.Valid;
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaEventoRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroAvanzato;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructEvento;
+import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.EventoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +22,8 @@ public class EventoController {
 
     EventoService service;
 
-    public EventoController(EventoService s)
+
+    public EventoController(EventoService s, MapStructEvento m)
     {
         service = s;
     }
@@ -56,6 +61,13 @@ public class EventoController {
     {
         boolean eliminato = service.deleteEvent(idEvento);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/all/getEventiFiltrati")
+    public ResponseEntity<List<GetAllEventsResponseDTO>> getEventiFiltrati(@RequestBody FiltroAvanzato request)
+    {
+        List<GetAllEventsResponseDTO> events = service.getEventiFiltrati(request).stream().map(GetAllEventsResponseDTO::new).toList();
+        return  ResponseEntity.status(HttpStatus.OK).body(events);
     }
 
 }

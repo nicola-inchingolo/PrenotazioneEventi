@@ -4,6 +4,7 @@ import org.elis.softwareprenotazioneeventi.DTO.request.SezioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructSezione;
 import org.elis.softwareprenotazioneeventi.model.Biglietto;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Ripetizione;
@@ -25,6 +26,7 @@ public class SezioneServiceImpl implements SezioneService {
     private SezioneRepository sezioneRepository;
     private LuogoRepository luogoRepository;
 
+
     public SezioneServiceImpl(SezioneRepository s, LuogoRepository l)
     {
         sezioneRepository = s;
@@ -42,8 +44,9 @@ public class SezioneServiceImpl implements SezioneService {
 
             if (sezioniLuogo.isEmpty() || !esiste ) {
                 Sezione sezione = new Sezione();
-                sezione.setNome(request.getNome());
-                sezione.setLuogo(luogo.get());
+                /*sezione.setNome(request.getNome());
+                sezione.setLuogo(luogo.get());*/
+                sezione = mapStructSezione.fromSezioneRequestDTO(request);
                 luogo.get().getSezioni().add(sezione);
                 sezioneRepository.save(sezione);
                 luogoRepository.save(luogo.get());

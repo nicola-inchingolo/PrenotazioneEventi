@@ -1,9 +1,11 @@
 package org.elis.softwareprenotazioneeventi.service.definition;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaRecensioneRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroRecensione;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.model.Recensione;
 import org.elis.softwareprenotazioneeventi.model.User;
 
 import java.util.List;
@@ -19,5 +21,6 @@ public interface RecensioneService {
     public boolean modificaDescrizione(ModificaDescrizioneRecensioneDTO request, User user);
 
     public boolean rimuoviRecensione(long idRecensione);
+    public List<Recensione> getRecensioniFiltrate(FiltroRecensione request);
 
 }

@@ -11,3 +11,24 @@ values
 insert into Luogo(nome,via,città,provincia,cap)
 values
 ('Colosseo', 'via del Corso', 'ROMA', 'RM', 00159);
+
+insert into Sezione(nome, id_luogo)
+values
+('A',1);
+
+insert into Posto(nome,id_sezione)
+values
+('1', 1);
+
+insert into Evento(nome,descrizione)
+values ('Tomorrowland', 'boh');
+
+insert into Ripetizione(datainizio, datafine, ora_inizio, ora_fine, id_evento, id_luogo)
+values ('2023-12-12','2023-12-14','08:00','13:00',1, 1);
+
+insert into Biglietto(prezzo, venduto, id_user, id_posto, id_ripetizione)
+values (12, true, 4, 1, 1);
+
+insert into Recensione(descrizione,votazione,id_user,id_evento)
+values
+    ('servizio del cinema scadente', 1,4, 1);

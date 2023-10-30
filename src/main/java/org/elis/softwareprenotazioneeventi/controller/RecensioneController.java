@@ -2,11 +2,15 @@ package org.elis.softwareprenotazioneeventi.controller;
 
 import jakarta.validation.Valid;
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaRecensioneRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroRecensione;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaDescrizioneRecensioneDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaVotazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRecensioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.DTO.response.GetAllUsersResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructRecensione;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.service.definition.RecensioneService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +20,8 @@ import java.util.List;
 @RestController
 public class RecensioneController {
 
-    RecensioneService service;
+    private RecensioneService service;
+
 
     public RecensioneController(RecensioneService s)
     {
@@ -60,6 +65,14 @@ public class RecensioneController {
     {
         boolean eliminato = service.rimuoviRecensione(idRecensione);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/all/getRecensioniFiltrate")
+    public ResponseEntity<List<GetAllRecensioniResponseDTO>> getRecensioniFiltrate(@RequestBody FiltroRecensione request)
+    {
+        System.out.println("request "+request);
+        List<GetAllRecensioniResponseDTO> recensioni = service.getRecensioniFiltrate(request).stream().map(GetAllRecensioniResponseDTO::new).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(recensioni);
     }
 
 }

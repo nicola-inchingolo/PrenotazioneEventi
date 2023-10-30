@@ -3,6 +3,7 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaReplicaDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructRipetizione;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Ripetizione;
@@ -26,11 +27,13 @@ public class RipetizioneServiceImpl implements RipetizioneService {
     EventoRepository eventoRepository;
     LuogoRepository luogoRepository;
 
+
     public RipetizioneServiceImpl(RipetizioneRepository r, EventoRepository e, LuogoRepository l)
     {
         eventoRepository = e;
         ripetizioneRepository = r;
         luogoRepository = l;
+
     }
 
     @Override
@@ -48,10 +51,11 @@ public class RipetizioneServiceImpl implements RipetizioneService {
                  if(request.getDataFine().isAfter(request.getDataInizio())) {
                      if(request.getOraFine().isAfter(request.getOraInizio())) {
                          Ripetizione ripetizione = new Ripetizione();
-                         ripetizione.setDatainizio(request.getDataInizio());
+                         /*ripetizione.setDatainizio(request.getDataInizio());
                          ripetizione.setDatafine(request.getDataFine());
                          ripetizione.setOraInizio(request.getOraInizio());
-                         ripetizione.setOraFine(request.getOraFine());
+                         ripetizione.setOraFine(request.getOraFine());*/
+                         ripetizione = mapStructRipetizione.fromCreaReplicaDTO(request);
                          ripetizione.setEvento(evento.get());
                          ripetizione.setLuogo(luogo.get());
                          ripetizioneRepository.save(ripetizione);

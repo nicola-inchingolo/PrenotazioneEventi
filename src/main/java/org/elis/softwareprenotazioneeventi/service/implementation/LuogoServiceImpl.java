@@ -5,6 +5,7 @@ import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllSezioniResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructLuogo;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
@@ -27,6 +28,7 @@ public class LuogoServiceImpl implements LuogoService {
     private LuogoRepository luogoRepository;
     private UserRepository userRepository;
 
+
     public LuogoServiceImpl(LuogoRepository l, UserRepository u)
     {
         userRepository = u;
@@ -39,11 +41,12 @@ public class LuogoServiceImpl implements LuogoService {
                 Optional<Luogo> l = luogoRepository.findByNome(request.getNome());
                 if (l.isEmpty()) {
                     Luogo luogo = new Luogo();
-                    luogo.setNome(request.getNome());
+                    /*luogo.setNome(request.getNome());
                     luogo.setCap(request.getCap());
                     luogo.setCittà(request.getCittà());
                     luogo.setVia(request.getVia());
-                    luogo.setProvincia(request.getProvincia());
+                    luogo.setProvincia(request.getProvincia());*/
+                    luogo = mapStructLuogo.fromCreaLuogoRequestDTO(request);
                     luogoRepository.save(luogo);
                     return true;
                 }

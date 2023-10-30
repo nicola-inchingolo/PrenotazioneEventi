@@ -1,14 +1,17 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
 import org.elis.softwareprenotazioneeventi.DTO.request.CreaEventoRequestDTO;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroAvanzato;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllCategoriaResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllEventsResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllRipetizioneResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructEvento;
 import org.elis.softwareprenotazioneeventi.model.Categoria;
 import org.elis.softwareprenotazioneeventi.model.Evento;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
 import org.elis.softwareprenotazioneeventi.repository.CategoriaRepository;
+import org.elis.softwareprenotazioneeventi.repository.CriteriaUserRepository;
 import org.elis.softwareprenotazioneeventi.repository.EventoRepository;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.EventoService;
@@ -27,12 +30,14 @@ public class EventoServiceImpl implements EventoService {
     private EventoRepository eventoRepository;
     private CategoriaRepository categoriaRepository;
     private UserRepository userRepository;
+    private CriteriaUserRepository criteriaUserRepository;
 
-    public EventoServiceImpl(EventoRepository e, UserRepository u, CategoriaRepository c)
+    public EventoServiceImpl(EventoRepository e, UserRepository u, CategoriaRepository c, CriteriaUserRepository cr)
     {
         categoriaRepository = c;
         eventoRepository = e;
         userRepository = u;
+        criteriaUserRepository = cr;
     }
 
     @Override
@@ -41,9 +46,7 @@ public class EventoServiceImpl implements EventoService {
 
                 Optional<Evento> ev = eventoRepository.findByNome(request.getNome());
                 if (ev.isEmpty()) {
-                    Evento evento = new Evento();
-                    evento.setNome(request.getNome());
-                    evento.setDescrizione(request.getDescrizione());
+                    Evento evento = mapStructEvento.fromCreaEventoRequestDTO(request);
                     List<Categoria> categorie = new ArrayList<>();
 
                     if(request.getCategorie() != null) {
@@ -130,8 +133,6 @@ public class EventoServiceImpl implements EventoService {
     @Override
     public List<GetAllEventsResponseDTO> getAllEventsByLuogo(String nomeLuogo) {
 
-
-
         List<Evento> eventi =  eventoRepository.findAllByRepliche_Luogo_Nome(nomeLuogo);
         List<GetAllEventsResponseDTO> response = new ArrayList<>();
 
@@ -149,16 +150,11 @@ public class EventoServiceImpl implements EventoService {
                 repliche.add(replica);
             });
 
-
-
-
             response.add(new GetAllEventsResponseDTO(e.getId(), e.getNome(), e.getDescrizione(), categorie, repliche));
 
         });
 
         return response;
-
-
 
     }
 
@@ -175,6 +171,11 @@ public class EventoServiceImpl implements EventoService {
       {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "evento non resistente");
       }
+    }
+
+    @Override
+    public List<Evento> getEventiFiltrati(FiltroAvanzato request) {
+        return criteriaUserRepository.getEventiFiltrati(request);
     }
 
 

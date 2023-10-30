@@ -26,11 +26,14 @@ public class Biglietto {
     @ManyToOne
     @JoinColumn(name = "id_user")
     private User user;
-    @ManyToMany
+   @ManyToMany
     @JoinTable(name = "carrello",
             joinColumns = @JoinColumn(name = "id_biglietto", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "id_utente", nullable = false))
     private List<User> utenti;
+
+    /*@OneToMany(mappedBy = "carrello")
+    private List<Carrello> carrelli;*/
     @OneToOne
     @JoinColumn(name = "id_posto", referencedColumnName = "id")
     private Posto posto;

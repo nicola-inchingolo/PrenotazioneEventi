@@ -1,5 +1,6 @@
 package org.elis.softwareprenotazioneeventi.service.definition;
 
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroUser;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
@@ -21,8 +22,10 @@ public interface UserService {
     public boolean sbloccaAccount(long idUser, User userRichiesta);
     public List<GetAllUsersResponseDTO> getAllUsers();
     public boolean modificaPassword(ModificaPasswordRequestDTO request);
-
     public User findByEmail(String email);
+    public List<User> getUsersFiltrati(FiltroUser request);
+
+
 
 
 }

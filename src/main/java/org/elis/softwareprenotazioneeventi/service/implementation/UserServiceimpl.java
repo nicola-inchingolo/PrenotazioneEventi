@@ -3,16 +3,24 @@ package org.elis.softwareprenotazioneeventi.service.implementation;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import org.elis.softwareprenotazioneeventi.DTO.request.FiltroUser;
 import org.elis.softwareprenotazioneeventi.DTO.request.LoginRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaPasswordRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.RegistrazioneRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.*;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructUser;
+import org.elis.softwareprenotazioneeventi.Mapper.UserMapper;
 import org.elis.softwareprenotazioneeventi.exception.gestori.UserNotFoundException;
 import org.elis.softwareprenotazioneeventi.model.Role;
 import org.elis.softwareprenotazioneeventi.model.User;
+import org.elis.softwareprenotazioneeventi.repository.CriteriaUserRepository;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.UserService;
 import org.elis.softwareprenotazioneeventi.utils.PasswordValidator;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,19 +31,26 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@CacheConfig(cacheNames = {"users"})
 public class UserServiceimpl implements UserService {
 
     private UserRepository userRepository;
+    private CriteriaUserRepository criteriaUserRepository;
 
     private final Validator validator;
 
-    public UserServiceimpl(UserRepository repository, Validator v)
+    private final UserMapper userMapper;
+    public UserServiceimpl(UserRepository repository, Validator v, CriteriaUserRepository c, UserMapper u)
     {
         userRepository = repository;
         validator = v;
+        criteriaUserRepository = c;
+        userMapper = u;
     }
 
+
     @Override
+    @Caching(evict = @CacheEvict(cacheNames = "clienti"))
     public boolean registrazioneCliente(RegistrazioneRequestDTO request) {
         Set<ConstraintViolation<RegistrazioneRequestDTO>> violation=validator.validate(request);
         if(!violation.isEmpty()){
@@ -56,14 +71,14 @@ public class UserServiceimpl implements UserService {
                     if(request.getDataDiNascita().isBefore(LocalDate.now())) {
                         if(CodiceFicaleValidator.isCodiceFiscaleValid(request.getCodiceFiscale())) {*/
             if(request.getPassword().equals(request.getPasswordRipetuta())) {
-                User u = new User();
-                u.setEmail(request.getEmail());
+                User u = userMapper.toRegistrazioneRequestDTO(request);
+               /* u.setEmail(request.getEmail());
                 u.setCognome(request.getCognome());
-                u.setNome(request.getNome());
+                u.setNome(request.getNome());*/
                 u.setRuolo(Role.CLIENTE);
-                u.setDataNascita(request.getDataDiNascita());
+                /*u.setDataNascita(request.getDataDiNascita());
                 u.setCodiceFiscale(request.getCodiceFiscale());
-                u.setPassword(request.getPassword());
+                u.setPassword(request.getPassword());*/
                 userRepository.save(u);
                 return true;
             }
@@ -100,6 +115,7 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
+    @Caching( evict = @CacheEvict(cacheNames = "venditori"))
     public boolean registrazioneVenditore(RegistrazioneRequestDTO request) {
 
                 Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
@@ -109,14 +125,14 @@ public class UserServiceimpl implements UserService {
                             if (request.getDataDiNascita().isBefore(LocalDate.now())) {
                                 if(CodiceFicaleValidator.isCodiceFiscaleValid(request.getCodiceFiscale())) {*/
                     if(request.getPassword().equals(request.getPasswordRipetuta())) {
-                        User u = new User();
-                        u.setEmail(request.getEmail());
+                        User u = userMapper.toRegistrazioneRequestDTO(request);
+                        /*u.setEmail(request.getEmail());
                         u.setCognome(request.getCognome());
-                        u.setNome(request.getNome());
+                        u.setNome(request.getNome());*/
                         u.setRuolo(Role.VENDITORE);
-                        u.setDataNascita(request.getDataDiNascita());
+                        /*u.setDataNascita(request.getDataDiNascita());
                         u.setCodiceFiscale(request.getCodiceFiscale());
-                        u.setPassword(request.getPassword());
+                        u.setPassword(request.getPassword());*/
                         userRepository.save(u);
                         return true;
                     }
@@ -142,6 +158,7 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
+    @Caching( evict = @CacheEvict(cacheNames = "admin"))
     public boolean registrazioneAdmin(RegistrazioneRequestDTO request) {
 
                 Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
@@ -154,14 +171,14 @@ public class UserServiceimpl implements UserService {
 
                     if(request.getPassword().equals(request.getPasswordRipetuta()))
                     {
-                        User u = new User();
-                        u.setEmail(request.getEmail());
+                        User u = userMapper.toRegistrazioneRequestDTO(request);
+                        /*u.setEmail(request.getEmail());
                         u.setCognome(request.getCognome());
-                        u.setNome(request.getNome());
+                        u.setNome(request.getNome());*/
                         u.setRuolo(Role.ADMIN);
-                        u.setDataNascita(request.getDataDiNascita());
+                        /*u.setDataNascita(request.getDataDiNascita());
                         u.setCodiceFiscale(request.getCodiceFiscale());
-                        u.setPassword(request.getPassword());
+                        u.setPassword(request.getPassword());*/
                         userRepository.save(u);
                         return true;
                     }
@@ -193,8 +210,13 @@ public class UserServiceimpl implements UserService {
 
     @Override
     public User login(LoginRequestDTO request) {
+         return login(request.getEmail(),request.getPassword());
+    }
 
-        Optional<User> user = userRepository.findUserByEmailAndPassword(request.getEmail(), request.getPassword());
+    @Cacheable(value = "user", key = "#email.concat('-').concat(#password)")
+    public User login(String email, String password)
+    {
+        Optional<User> user = userRepository.findUserByEmailAndPassword(email, password);
         if(user.isPresent()) {
             if(user.get().getAttivo()) {
                 return user.orElseThrow(UserNotFoundException::new);
@@ -206,8 +228,10 @@ public class UserServiceimpl implements UserService {
         else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email e/o password errati");
         }
+
     }
 
+    @Cacheable(value = "clienti")
     @Override
     public List<GetAllUsersResponseDTO> findAllClienti() {
 
@@ -243,6 +267,7 @@ public class UserServiceimpl implements UserService {
 
     }
 
+    @Cacheable(value = "venditori")
     @Override
     public List<GetAllUsersResponseDTO> findAllVenditori() {
        List<User> users = userRepository.findAllByRuolo(Role.VENDITORE);;
@@ -277,6 +302,7 @@ public class UserServiceimpl implements UserService {
 
     }
 
+    @Cacheable(value = "admin")
     @Override
     public List<GetAllUsersResponseDTO> findAllAdmin(){
 
@@ -374,6 +400,7 @@ public class UserServiceimpl implements UserService {
         }
     }
 
+    @Cacheable(value = "users")
     @Override
     public List<GetAllUsersResponseDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -434,8 +461,14 @@ public class UserServiceimpl implements UserService {
         }
     }
 
+    @Cacheable(value = "user", key = "#email", sync = true)
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public List<User> getUsersFiltrati(FiltroUser request) {
+        return criteriaUserRepository.getUserFiltered(request);
     }
 }

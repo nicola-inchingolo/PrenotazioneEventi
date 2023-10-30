@@ -4,6 +4,7 @@ import org.elis.softwareprenotazioneeventi.DTO.request.CreapostoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllLuoghiResponseDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllPostiResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructPosto;
 import org.elis.softwareprenotazioneeventi.model.Luogo;
 import org.elis.softwareprenotazioneeventi.model.Posto;
 import org.elis.softwareprenotazioneeventi.model.Sezione;
@@ -24,6 +25,7 @@ public class PostoServiceImpl implements PostoService {
     PostoRepository postoRepository;
     SezioneRepository sezioneRepository;
 
+
     public PostoServiceImpl(PostoRepository p, SezioneRepository s)
     {
         postoRepository = p;
@@ -39,7 +41,8 @@ public class PostoServiceImpl implements PostoService {
             Optional<Posto> p = postoRepository.findPostoByNomeAndAndSezione_Nome(request.getNome(), sezione.get().getNome());
             if (p.isEmpty()) {
                 Posto posto = new Posto();
-                posto.setNome(request.getNome());
+               /* posto.setNome(request.getNome());*/
+                posto = mapStructPosto.fromCreaPostoDTO(request);
                 posto.setSezione(sezione.get());
                 postoRepository.save(posto);
                 return true;
@@ -62,9 +65,18 @@ public class PostoServiceImpl implements PostoService {
 
         posti.forEach(p ->
         {
-            response.add(
-                    new GetAllPostiResponseDTO(p.getId(),p.getNome(),p.getSezione().getNome(), p.getBiglietto().getRipetizione().getDatainizio(),p.getBiglietto().getRipetizione().getEvento().getNome())
-            );
+            if(p.getBiglietto()!=null) {
+
+                response.add(
+                        new GetAllPostiResponseDTO(p.getId(), p.getNome(), p.getSezione().getNome(), p.getBiglietto().getRipetizione().getDatainizio(), p.getBiglietto().getRipetizione().getEvento().getNome())
+                );
+            }
+            else
+            {
+                response.add(
+                        new GetAllPostiResponseDTO(p.getId(), p.getNome(), p.getSezione().getNome(), null, null)
+                );
+            }
         });
         return response;
     }

@@ -1,14 +1,17 @@
 package org.elis.softwareprenotazioneeventi.service.implementation;
 
+import jakarta.transaction.Transactional;
 import org.elis.softwareprenotazioneeventi.DTO.request.BigliettoRequestDTO;
 import org.elis.softwareprenotazioneeventi.DTO.request.ModificaBigliettoDTO;
 import org.elis.softwareprenotazioneeventi.DTO.response.GetAllBigliettiResponseDTO;
+import org.elis.softwareprenotazioneeventi.Mapper.MapStructBiglietto;
 import org.elis.softwareprenotazioneeventi.model.*;
 import org.elis.softwareprenotazioneeventi.repository.BigliettoRepository;
 import org.elis.softwareprenotazioneeventi.repository.PostoRepository;
 import org.elis.softwareprenotazioneeventi.repository.RipetizioneRepository;
 import org.elis.softwareprenotazioneeventi.repository.UserRepository;
 import org.elis.softwareprenotazioneeventi.service.definition.BigliettoService;
+import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +27,7 @@ public class BigliettoServiceImpl  implements BigliettoService {
     private UserRepository userRepository;
     private PostoRepository postoRepository;
     private RipetizioneRepository ripetizioneRepository;
+
 
 
     public BigliettoServiceImpl(BigliettoRepository b, UserRepository u, PostoRepository p, RipetizioneRepository r)
@@ -44,8 +48,9 @@ public class BigliettoServiceImpl  implements BigliettoService {
             Optional<Biglietto> b = bigliettoRepository.findByPosto_NomeAndPosto_Sezione_Id(posto.get().getNome(), posto.get().getSezione().getId());
             if (b.isEmpty()) {
                 Biglietto biglietto = new Biglietto();
-                biglietto.setPosto(posto.get());
-                biglietto.setPrezzo(request.getPrezzo());
+               /* biglietto.setPosto(posto.get());
+                biglietto.setPrezzo(request.getPrezzo());*/
+                biglietto = mapStructBiglietto.fromCreaBigliettorequestDTO(request);
                 biglietto.setRipetizione(ripetizione.get());
                 bigliettoRepository.save(biglietto);
                 return true;
@@ -61,21 +66,20 @@ public class BigliettoServiceImpl  implements BigliettoService {
         }
     }
 
+
     @Override
     public boolean aggiungiCarello(long idBiglietto, User user) {
         if(user != null)
         {
             Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
-
+            user = userRepository.findById(user.getId()).get();
             if(b.isPresent())
             {
                 Biglietto biglietto = b.get();
                 if(!biglietto.getVenduto()) {
-                    if (!user.getCarrello().contains(biglietto)) {
+                    if (biglietto.getUser() == null || (user != biglietto.getUser())  ) {
                         user.getCarrello().add(biglietto);
-                        biglietto.getUtenti().add(user);
                         userRepository.save(user);
-                        bigliettoRepository.save(biglietto);
                         return true;
                     }
                     else
@@ -100,14 +104,20 @@ public class BigliettoServiceImpl  implements BigliettoService {
         }
     }
 
+    //aggiusta
     @Override
     public boolean confermaAcquisto(long idBiglietto, User user) {
         Optional<Biglietto> b = bigliettoRepository.findById(idBiglietto);
+        user = userRepository.findById(user.getId()).get();
+
+        System.out.println(user);
         if(user != null) {
 
             if (b.isPresent()) {
                 Biglietto biglietto = b.get();
-                if (biglietto.getUtenti().contains(user) && !biglietto.getVenduto() && user.getCarrello().contains(biglietto))
+                System.out.println(user.getCarrello());
+                System.out.println(user.getCarrello().contains(biglietto));
+                if (user.getCarrello().contains(biglietto) && !biglietto.getVenduto() )
                 {
 
                     biglietto.setVenduto(true);
