@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="PATTERN_LOG">%d{dd-MM-yyyy' 'hh:mm:ss} %p %m%n</Property>
+        <Property name="DIRECTORY_LOG">C:/Users/Nice/Desktop/mieiLog</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${PATTERN_LOG}"/>
+        </Console>
+        <RollingFile name="debugFile" fileName="${DIRECTORY_LOG}/logDebug.txt"
+                     filePattern="${DIRECTORY_LOG}/logDebug-%d{dd-MM-yyyy}-%i.txt">
+            <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG"
+                              onMatch="ACCEPT" onMissmatch="DENY"/>
+            <PatternLayout pattern="${PATTERN_LOG}"/>
+            <Policies>
+                    <SizedBasedTriggeringPolicy size="195000KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="warnFile" fileName="${DIRECTORY_LOG}/logWarn.txt"
+                     filePattern="${DIRECTORY_LOG}/logWarn-%d{dd-MM-yyyy}-%i.txt">
+            <LevelRangeFilter minLevel="WARN" maxLevel="WARN"
+                              onMatch="ACCEPT" onMissmatch="DENY"/>
+            <PatternLayout pattern="${PATTERN_LOG}"/>
+            <Policies>
+                <SizedBasedTriggeringPolicy size="195000KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="errorFile" fileName="${DIRECTORY_LOG}/logError.txt"
+                     filePattern="${DIRECTORY_LOG}/logError-%d{dd-MM-yyyy}-%i.txt">
+            <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR"
+                              onMatch="ACCEPT" onMissmatch="DENY"/>
+            <PatternLayout pattern="${PATTERN_LOG}"/>
+            <Policies>
+                <SizedBasedTriggeringPolicy size="195000KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="infoFile" fileName="${DIRECTORY_LOG}/logInfo.txt"
+                     filePattern="${DIRECTORY_LOG}/logInfo-%d{dd-MM-yyyy}-%i.txt">
+            <LevelRangeFilter minLevel="INFO" maxLevel="INFO"
+                              onMatch="ACCEPT" onMissmatch="DENY"/>
+            <PatternLayout pattern="${PATTERN_LOG}"/>
+            <Policies>
+                <SizedBasedTriggeringPolicy size="195000KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="all">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="debugFile"/>
+            <AppenderRef ref="warnFile"/>
+            <AppenderRef ref="errorFile"/>
+            <AppenderRef ref="infoFile"/>
+        </Root>
+
+    </Loggers>
+
+</configuration>
